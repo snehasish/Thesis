@@ -1,0 +1,45 @@
+V1.25
+*****
+	
+2012-05-30  Juan Galvez <jgalvez@sfu.ca>
+	* Addition of Partial Copyright License
+
+V1.24
+*****
+	
+2011-12-20  Chris McIntosh <cmcintos@sfu.ca>
+	* Change to title page requested by Joanie Wolfe, Library
+
+V1.23
+*****
+	
+2010-08-12  Brian Kroeker <kroeker@cs.sfu.ca>
+	* Change to Copyright Notice requested by Penny Simpson, Library
+
+V1.22
+*****
+	
+2007-03-14  Brian Kroeker <kroeker@cs.sfu.ca>
+	* Change to library URL requested by Penny Simpson, Library
+
+V1.21
+*****
+	
+2006-03-07  Greg Baker  <ggbaker@cs.sfu.ca>
+	* Trivial change to approval page.
+
+V1.2
+****
+
+2003-08-10  Greg Baker  <ggbaker@lefty.cs.sfu.ca>
+
+	* added "Contents" reference to table of contents
+
+V1.1
+****
+
+Fri Apr 9 17:01:32 1999  Petr Kubon   <petr@cs.sfu.ca>
+
+     * csthesis.sty: Modified \@xfloat to make compatible with the
+     package color.sty (CTAN)
+
