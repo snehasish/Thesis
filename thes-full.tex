@@ -78,7 +78,7 @@
 \otherlistpagetrue
 
 %%% front matter 
-\input{files/titapp} %% title, approval
+\input{files/00-titapp} %% title, approval
 
 %% Partial Copyright License (PCL)
 \newpage 			
@@ -95,26 +95,26 @@
 \makeatother
 \newpage
 
-\input{files/abstract} %% abstract
-\input{files/dedquot} %% dedication and quotation, if any 
-\input{files/ack} %%  acknowledgments
+\input{files/01-abstract} %% abstract
+\input{files/02-dedquot} %% dedication and quotation, if any 
+\input{files/03-ack} %%  acknowledgments
 
 %%%  generate contents, lists of figures, etc.
 \lists
 
 %% preface (foreword), if any
-\input{files/preface} 
+\input{files/04-preface} 
 
 %%% prepare main section
 \beforetext
 
 %%% main matter - chapters
-\input{files/one} 
-\input{files/two}
-\input{files/three}
-\input{files/four}
-\input{files/five}
-\input{files/six}
+\input{files/05-introduction} 
+\input{files/06-background}
+\input{files/07-architecture}
+\input{files/08-implementation}
+\input{files/09-evaluation}
+\input{files/10-conclusion}
 
 %%%  appendices, if any
 % \begin{appendices}
