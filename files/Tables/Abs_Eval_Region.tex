@@ -1,0 +1,41 @@
+% This is not updated
+\begin{table}[!h]
+\renewcommand\arraystretch{0.1} \setlength\minrowclearance{2pt}
+\centering
+{
+\footnotesize
+\caption{\AC\ Performance. Absolute \#s for miss rate, bandwidth, and cycles/instruction.}
+\begin{tabular}[!h]{|@{~}c@{~}||@{~}c@{~}|@{~}c@{~}||@{~}c@{~}|@{~}c@{~}|@{~}c@{~}|@{~}c@{~}|@{~}c@{~}|@{~}c@{~}|}
+\hline
+ & \multicolumn{2}{@{~}c@{~}||}{MPKI} &  \multicolumn{2}{@{~}c@{~}||}{BW bytes/1K} & CPI\\
+\hline
+          & L1        & L2              & L1$\Rightarrow$L2 & L2$\Rightarrow$Mem & \\
+\hline
+apache    &    64.9 & 19.6    &    5,000  &    2,067         &  8.3 \\
+art       &    133.7  &    53.0    &    5,475  &    1,425    &  16.0 \\
+astar     &    0.9    &    0.3     &    70     &    35       &  1.9 \\
+cactus    &    6.9    &    4.4     &    604    &    456      &  3.5 \\
+canne.    &    8.3    &    5.0     &    486    &    357      &  3.2 \\
+eclip.    &    3.6    &    $<$0.1  &    433    &    $<$1     &  1.8 \\
+faces.    &    5.5    &    4.7     &    683    &    632      &  3.0 \\
+ferre.    &    6.8    &    1.4     &    827    &    83       &  2.1 \\
+firef.    &    1.5    &    1.0     &    123    &    95       &  2.1 \\
+fluid.    &    1.7    &    1.4     &    138    &    127      &  1.9 \\
+freqm.    &    1.1    &    0.6     &    89     &    65       &  2.3 \\
+h2        &    4.6    &    0.4     &    328    &    46       &  1.8 \\
+jbb       &    24.6   &    9.6     &    1,542  &    830      &  5.0 \\
+lbm       &    63.1   &    42.2    &    3,755  &    3,438    &  13.6 \\
+mcf       &    55.8   &    40.7    &    2,519  &    2,073    &  13.2 \\
+milc      &    16.1   &    16.0    &    1,486  &    1,476    &  6.0 \\
+omnet.    &    2.5    &    $<$0.1  &    158    &    $<$1     &  1.9 \\
+sople.    &    30.7   &    4.0     &    1,045  &    292      &  3.1 \\
+tpcc      &    5.4    &    0.5     &    438    &    36       &  2.0 \\
+trade.    &    3.6    &    $<$0.1  &    410    &    6        &  1.8 \\
+twolf     &    23.3   &    0.6     &    1,326  &    45       &  2.2 \\
+x264      &    4.1    &    1.8     &    270    &    190      &  2.2 \\
+\hline
+						
+\end{tabular}
+}
+\label{table:Abs_Eval_Oracle}
+\end{table}

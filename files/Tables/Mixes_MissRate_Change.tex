@@ -1,0 +1,25 @@
+\begin{table}[!h]
+\centering
+{
+\footnotesize
+  \begin{tabular}[!h]{|l|@{~}c@{~}|@{~}c@{~}|}
+    \hline
+    Mix & \multicolumn{2}{ c | }{Percent Miss Rate Improvement} \\
+    \hline
+    & Overall & Best \\    
+    \hline
+    bodytrack, fluidanimate, omnetpp, soplex & 	-0.34 & 11.02
+    (fluidanimate)  \\
+    
+    canneal, dedup, raytrace, milc	& 0.12 & 11.12 (raytrace) \\
+    
+    blackscholes, dedup, lbm, mcf	& 9.59 & 17.38 (blackscholes) \\
+    
+    bodytrack, canneal, lbm, soplex	& 8.78 & 27.31 (canneal) \\
+    \hline
+\end{tabular}
+}
+\caption{Percent improvement in Miss rate for applications running on a
+standard 512K shared cache compared to a shared 512K equivalent \AC.  }
+\label{table:multiprogrammed}
+\end{table}

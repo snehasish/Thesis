@@ -1,0 +1,34 @@
+
+\begin{table}[!h]
+\caption{Optimal block size. Metric: $\mathbf{\frac{1}{Miss-rate \times Bandwidth}}$}
+\label{table:bwmr_classify}
+\begin{center}
+{
+\small
+  \begin{tabular}{ |@{~}c@{~}| m{0.72\columnwidth} |}
+    \hline
+    \multicolumn{2}{|c|}{64K, 4-way} \\
+    \hline
+    Block  & Benchmarks \\
+    \hline
+    32B   & cactus, eclipse, facesim, ferret, firefox, fluidanimate,freqmine, milc, tpc-c, tradesoap \\
+    \hline
+    64B   &  art \\
+    \hline
+    128B  & apache, astar, canneal, h2, jbb, lbm, mcf, omnetpp, soplex, twolf, x264 \\
+    \hline
+    \multicolumn{2}{|c|}{1M, 8-way} \\
+    \hline
+    Block & Benchmarks \\
+    \hline
+    64B  & apache, astar, cactus, eclipse, facesim, ferret, firefox, freqmine, h2, lbm, milc, omnetpp, tradesoap, x264\\
+    \hline
+    128B & art\\
+    \hline
+    256B  & canneal, fluidanimate, jbb, mcf, soplex, tpc-c, twolf\\
+    \hline
+  \end{tabular}
+}
+\end{center}
+\end{table}
+
