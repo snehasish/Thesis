@@ -24,6 +24,13 @@ J.~S. Liptay.
 \newblock Structural aspects of the system/360 model 85: Ii the cache.
 \newblock {\em IBM Syst. J.}, 7(1):15--21, March 1968.
 
+\bibitem{Liu:2011:SPD:2048066.2048070}
+Tongping Liu and Emery~D. Berger.
+\newblock Sheriff: precise detection and automatic mitigation of false sharing.
+\newblock In {\em Proceedings of the 2011 ACM international conference on
+  Object oriented programming systems languages and applications}, OOPSLA '11,
+  pages 3--18, New York, NY, USA, 2011. ACM.
+
 \bibitem{Llanos:2006:TOT:1228268.1228270}
 Diego~R. Llanos.
 \newblock Tpcc-uva: an open-source tpc-c implementation for global performance
