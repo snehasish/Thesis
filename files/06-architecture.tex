@@ -3,67 +3,50 @@
 %
 %     Chapter 3   
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Amoeba Cache Architecture}
 \label{chap:ac_architecture}
 
-As described in Section \ref{sec:cache_memory_systems}, a conventional cache organises the data array into a 2 dimensional structure. A transparently addressed cache uses the same namespace (memory address space layout) as the main memory. The blocks which are stored in the sets are \textit{tagged} with the aligned start address of block present in the main memory. The \textit{tags} for the cache blocks currently present in the cache set are maintained in a separate array. When a search is being performed to find out whether a required physical address is present in the cache, the tag array is looked up to determine a cache hit or a cache miss. The organization of the cache set and tag array is shown in Figure \ref{fig:set_assoc_arch}. The effective address is the virtual address supplied by the CPU of the required datum. The component bits of the effective address is segmented into 3 parts which form the \textit{Virtual Page Number(VPN)}, set number and byte. The set number and byte are looked up in the tag array while the VPN is looked up in the \textit{Translation Lookaside Buffer(TLB)} to check that the current process has brought in the corresponding page and it is valid. The organisation described (and shown in Fig \ref{fig:set_assoc_arch}) is virtually indexed, physically tagged organisation where the lookup logic does not include the TLB translation in the critical path to enable faster searches. There are other organisations such as virtually indexed, virtually tagged and physically indexed, physically tagged which are uncommon due to inherent issues with their design. The tradeoff for a virtually indexed, physically tagged cache is that it can only grow in size with an increase in the associativity of each set, or an increase in the size of each cache block. The Intel Sandy Bridge architecture is known to use a virtually indexed, physically tagged cache organisation.
+As described in Section \ref{sec:cache_memory_systems}, a conventional cache organises the data array into a 2 dimensional structure. A transparently addressed cache uses the same namespace (memory address space layout) as the main memory. The blocks which are stored in the sets are \textit{tagged} with the aligned start address of block present in the main memory. The \textit{tags} for the cache blocks currently present in the cache set are maintained in a separate array. When a search is being performed to find out whether a required physical address is present in the cache, the tag array is looked up to determine a cache hit or a cache miss. The organization of the cache set and tag array is shown in Figure \ref{fig:set_assoc_arch}. The effective address is the virtual address supplied by the CPU of the required datum. The component bits of the effective address is segmented into 3 parts which form the \textit{Virtual Page Number(VPN)}, set number and byte offset. The set number and byte offset are looked up in the tag array while the VPN is looked up in the \textit{Translation Lookaside Buffer(TLB)} to check that the current process has brought in the corresponding page and it is valid. The organisation described (and shown in Fig \ref{fig:set_assoc_arch}) is virtually indexed, physically tagged organisation where the lookup logic does not include the TLB translation in the critical path to enable faster searches. There are other organisations such as virtually indexed, virtually tagged and physically indexed, physically tagged which are uncommon due to inherent issues with their design. The tradeoff for a virtually indexed, physically tagged cache is that it can only grow in size with an increase in the associativity of each set, or an increase in the size of each cache block. The Intel Sandy Bridge architecture is known to use a virtually indexed, physically tagged cache organisation.
 
-\newpage
 
-\begin{figure}[h]
+
+\begin{figure}[b]
   %% Pg 84 - Jacob
   \begin{center}
     \includegraphics[width=\textwidth]{files/Figures/06-NWaySetAssocCache.pdf}
-    \caption[Conventional N-Way Set-Associative Cache]{\textbf{Conventional N-Way Set-Associative Cache} \newline 
-    \bigspot{1}  }
+    \caption[Conventional N-Way Set-Associative Cache]{\textbf{Conventional N-Way Set-Associative Cache} \bigspot{1} The Virtual Page Number (VPN) is used to look up the entry in the Translation Lookaside Buffer (TLB) \bigspot{2} According to the number of sets in the cache, the following bits from the address are used to look up the corresponding set from the cache \bigspot{3} The tags read out from the set are compared with the translation from the TLB and tested for equality \bigspot{4} The corresponding cache block is forwarded to the output buffer for the tag which matches the TLB lookup \bigspot{5} Using the byte offset from the CPU, the mutiplexer selects the correponding critical word }
     \label{fig:set_assoc_arch}
   \end{center}
 \end{figure}
 
+\clearpage
 
-The \AC\ architecture enables the memory hierarchy to fetch and allocate space
-for a range of words (i.e. a variable granularity cache block) based on the spatial
-locality of the application.  For example, consider a 64K cache (256 sets)
-that allocates 256 bytes per set. These 256 bytes can adapt to support, for
-example, eight 32-bytes blocks, thirty-two 8-byte blocks, or four 32-byte
-blocks and sixteen 8-byte blocks, based on the set of contiguous words likely
-to be accessed. The key challenge to supporting variable granularity blocks
-is how to grow and shrink the \# of tags as the \# of blocks per set vary with
-block granularity? \AC\ adopts a solution inspired by software data
-structures, where programs hold meta-data and actual data entries in the same
-address space.  To achieve maximum flexibility, \AC\ completely eliminates the
-tag array and collocates the tags with the actual data blocks (see
-Figure~\ref{fig:AmoebaCache}). We use a bitmap (\code{T? Bitmap}) to indicate
-which words in the data array represent tags. We also decouple the
-conventional valid/invalid bits (typically associated with the tags) and
-organize them into a separate array (V? : Valid bitmap) to simplify block
-replacement and insertion. V? and T?  bitmaps both require 1 bit for very word
-(64bits) in the data array (total overhead of 3\%). \AC{} tags are represented
-as a range (\code{Start} and \code{End} address) to support variable
-granularity blocks.  We next discuss the overall architecture.
+In contrast to a conventional cache, the \AC\ architecture enables the memory hierarchy to fetch and allocate space for a range of words (i.e. a variable granularity cache block) based on the spatial locality of the application. For example, consider a 64K cache (256 sets) that allocates 256 bytes per set. These 256 bytes can adapt to support, for example, eight 32-bytes blocks, thirty-two 8-byte blocks, or four 32-byte blocks and sixteen 8-byte blocks, based on the set of contiguous words likely to be accessed. 
+\\ \\
+The key challenges to realising the \AC\ architecture are
+\begin{enumerate}[noitemsep]
+	\item To support a variable number of blocks per set
+	\item To support a variable granularity for each block
+	\item To support a variable number of tags, which correspond to the blocks in the set
+\end{enumerate}
 
-% \subsection{Amoeba Blocks and Set-Indexing}
+\begin{figure}[h]
+  %% Pg 84 - Jacob
+  \begin{center}
+    \includegraphics[width=\textwidth]{files/Figures/06-AmoebaCacheArch.pdf}
+    \caption[Amoeba Cache Overview]{\textbf{Amoeba Cache Overview} The static RAM (SRAM) array where the tags and data are colocated is shown on the right. The \code{T? Bitmap} and the \code{V? Bitmap} for the \AC\ are shown on the left. Each block in the SRAM array represents 8 bytes (1 word). In this specific example, we show an \AC\ with 4 sets and 1024 bytes per set. The invalid, data and tag words (marked in the SRAM array) are tracked by setting the corresponding bits in the \code{T? and V? Bitmaps}. This information is maintained in order to simplify cache operations such as insertion and refills. }
+    \label{fig:amoeba_cache_arch}
+  \end{center}
+\end{figure}
+
+The \AC\ adopts a solution inspired by software data structures, where programs hold meta-data and actual data entries in the same address space. To achieve maximum flexibility, the \AC\ completely eliminates the tag array and collocates the tags with the actual data blocks (see Figure~\ref{fig:amoeba_cache_arch}). To distinguish which words are data words and which ones are tags within the set, we use a bitmap data structure (labeled \code{T? Bitmap} in Fig~\ref{fig:amoeba_cache_arch}). For each word in the set which is a tag, we set the corresponding bit in the \code{T? Bitmap}. We also decouple the conventional valid/invalid bits (typically associated with the tags) and organize them into a separate array (labeled \code{V? Bitmap} in Fig~\ref{fig:amoeba_cache_arch}) to simplify block replacement and insertion. \AC\ tags are composed of a \code{Region Tag} and a tuple which consists of the \code{Start} and \code{End} address of the variable granularity cache block. The data block immediately follows the tag word as shown in Fig~\ref{fig:amoeba_cache_arch}. The following sections provide more detail about the \AC\ architecture and how cache operations are performed.
 
 
-% The \AC\ data array holds a collection of varied granularity \AB{}s that do
-% not overlap. Each \AB{} is a 4 tuple consisting of \code{\textless   Region
-% Tag, Start, End, Data- Block\textgreater} (Figure~\ref{fig:AmoebaCache}). A
-% \code{Region} is an aligned block of memory of size \code{RMAX} bytes.  The
-% boundaries of any \AB{} block (\code{Start} and \code{End}) always will lie
-% within the regions' boundaries. The minimum granularity of the data in an \AB\
-% is 1 word and the maximum is \code{RMAX} words. We can encode \code{Start}
-% and \code{End} in $log_2(RMAX)$ bits. The set indexing function 
-% masks the lower $log_2(RMAX)$ bits to ensure that all \AB{}s (every
-% memory word) from a region index to the same set. 
-% The Region Tag and Set-Index are identical for every word in the \AB{}.
-% Retaining the notion of \textit{sets} enables fast lookups and helps elude
-% challenges such as synonyms (same memory word mapping to different
-% sets). When comparing against a conventional cache, we set
-% \code{RMAX} to 8 words (64 bytes), ensuring that the set indexing function
-% is identical to that in the conventional cache to allow for a fair evaluation.
+\section{Amoeba Blocks and Set-Indexing}
 
+The \AC\ data array holds a collection of varied granularity \AB{}s that do not overlap. Each \AB\ is a 4 tuple consisting of \code{\textless RegionTag, Start, End, Data-Block\textgreater} (Figure~\ref{fig:amoeba_cache_arch}). The first 3 components of the tuple are equivalent to a tag in a conventional cache. We allocate 8 bytes (1 word) for each tag. In order to simplify cache lookups for \AB{}s, we partition the address space into \code{Regions}. A \code{Region} is an aligned block of memory of size \code{RMAX} bytes. The boundaries of any \AB{} block (\code{Start} and \code{End}) are constrained to lie within the regions' boundaries. The minimum granularity of the data in an \AB\ is 1 word and the maximum is \code{RMAX} words. We can encode \code{Start} and \code{End} in $log_2(RMAX)$ bits. The set indexing function  masks the lower $log_2(RMAX)$ bits to ensure that all \AB{}s (every memory word) from a region index to the same set.  The Region Tag and Set-Index are identical for every word in the \AB{}. Retaining the notion of \textit{sets} enables fast lookups and helps elude challenges such as synonyms (same memory word mapping to different sets). When comparing against a conventional cache, we set \code{RMAX} to 8 words (64 bytes), ensuring that the set indexing function is identical to that in the conventional cache to allow for a fair evaluation.
 
 
 % \subsection{Data Lookup}
@@ -82,20 +65,8 @@ granularity blocks.  We next discuss the overall architecture.
 % comparator ($log_2RMAX$ bits wide; e.g., 3 bits) that checks if the \AB\ holds
 % the required word. Finally, in \spot{3}, the tag match activates and selects
 % the appropriate word.
-% %\footnote{In Figure~\ref{fig:Lookup}   the
-% %word selector is logically shown as a single multiplexer; we   bank it in the
-% %physical implementation}. 
-% %We synthesized the complete lookup using a Synopsys toolchain.
 
 
-% % Things that need to be taken care of.
-% %1) Miss. On miss predict. How to predict look at section blah!. The
-% %predictor simply returns a range.
-% %2) Create an empty word indicator after inspecting the tags. 1
-% %bit/word indicates of where space is available.
-% %3) If hole size matches incoming block. allocate. else create space
-% %4) Possibly reorganize.
-% %5) Rare case; partial overlap. Merge with 
 
 % \subsection{Amoeba Block Insertion}
 % %
