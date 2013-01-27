@@ -36,7 +36,7 @@ The key challenges to realising the \AC\ architecture are
   %% Pg 84 - Jacob
   \begin{center}
     \includegraphics[width=\textwidth]{files/Figures/06-AmoebaCacheArch.pdf}
-    \caption[Amoeba Cache Overview]{\textbf{Amoeba Cache Overview} The static RAM (SRAM) array where the tags and data are colocated is shown on the right. The \code{T? Bitmap} and the \code{V? Bitmap} for the \AC\ are shown on the left. Each block in the SRAM array represents 8 bytes (1 word). In this specific example, we show an \AC\ with 4 sets and 1024 bytes per set. The invalid, data and tag words (marked in the SRAM array) are tracked by setting the corresponding bits in the \code{T? and V? Bitmaps}. This information is maintained in order to simplify cache operations such as insertion and refills. }
+    \caption[Amoeba Cache Overview]{\textbf{Amoeba Cache Overview} The static RAM (SRAM) array where the tags and data are colocated is shown on the right. The \code{T? Bitmap} and the \code{V? Bitmap} for the \AC\ are shown on the left. Each block in the SRAM array represents 8 bytes (1 word). In this specific example, we show an \AC\ with 4 sets and 1024 bytes per set. The invalid, data and tag words (marked in the SRAM array) are tracked by setting the corresponding bits in the \code{T? and V? Bitmaps}. This information is maintained in order to simplify cache operations such as insertion and refill. }
     \label{fig:amoeba_cache_arch}
   \end{center}
 \end{figure}
@@ -46,7 +46,22 @@ The \AC\ adopts a solution inspired by software data structures, where programs 
 
 \section{Amoeba Blocks and Set-Indexing}
 
-The \AC\ data array holds a collection of varied granularity \AB{}s that do not overlap. Each \AB\ is a 4 tuple consisting of \code{\textless RegionTag, Start, End, Data-Block\textgreater} (Figure~\ref{fig:amoeba_cache_arch}). The first 3 components of the tuple are equivalent to a tag in a conventional cache. We allocate 8 bytes (1 word) for each tag. In order to simplify cache lookups for \AB{}s, we partition the address space into \code{Regions}. A \code{Region} is an aligned block of memory of size \code{RMAX} bytes. The boundaries of any \AB{} block (\code{Start} and \code{End}) are constrained to lie within the regions' boundaries. The minimum granularity of the data in an \AB\ is 1 word and the maximum is \code{RMAX} words. We can encode \code{Start} and \code{End} in $log_2(RMAX)$ bits. The set indexing function  masks the lower $log_2(RMAX)$ bits to ensure that all \AB{}s (every memory word) from a region index to the same set.  The Region Tag and Set-Index are identical for every word in the \AB{}. Retaining the notion of \textit{sets} enables fast lookups and helps elude challenges such as synonyms (same memory word mapping to different sets). When comparing against a conventional cache, we set \code{RMAX} to 8 words (64 bytes), ensuring that the set indexing function is identical to that in the conventional cache to allow for a fair evaluation.
+
+\begin{figure}[h]
+  %% Get images from http://en.wikipedia.org/wiki/CPU_cache#Associativity
+  \subfloat[Memory Regions]{
+    \includegraphics[width=0.5\textwidth]{files/Figures/06-MemoryRegions.pdf}
+  }
+  \subfloat[Addressing]{
+     \includegraphics[width=0.5\textwidth]{files/Figures/06-Addressing.pdf}
+  }
+  \caption[Memory Regions]{ }
+  \label{fig:mem_region_addr}
+\end{figure}
+
+
+The \AC\ data array holds a collection of varied granularity \AB{}s that do not overlap. Each \AB\ is a 4 tuple consisting of \code{\textless RegionTag, Start, End, Data-Block\textgreater} (Figure~\ref{fig:amoeba_cache_arch}). The first 3 components of the tuple are equivalent to a tag in a conventional cache. We allocate 8 bytes (1 word) for each tag. In order to simplify cache lookups for \AB{}s, we partition the address space into \code{Regions}. A \code{Region} is an aligned block of memory of size \code{RMAX} bytes. The boundaries of any \AB{} block (\code{Start} and \code{End}) are constrained to lie within the regions' boundaries. The minimum granularity of the data in an \AB\ is 1 word and the maximum is \code{RMAX} words. We can encode \code{Start} and \code{End} in $log_2(RMAX)$ bits. The set indexing function masks the lower $log_2(RMAX)$ bits to ensure that all \AB{}s (every memory word) from a region index to the same set. The Region Tag and Set-Index are identical for every word in the \AB{}. Retaining the notion of \textit{sets} enables fast lookups and helps elude challenges such as synonyms (same memory word mapping to different sets). When comparing against a conventional cache, we set \code{RMAX} to 8 words (64 bytes), ensuring that the set indexing function is identical to that in the conventional cache to allow for a fair evaluation.
+
 
 
 % \subsection{Data Lookup}
