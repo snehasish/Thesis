@@ -136,7 +136,7 @@ to 95\% with a periodicity of roughly 400 million instructions.
 
 Applications display poor cache utilization due to inefficient data structure access patterns. This could be due to 
 \begin{enumerate}
-  \item Programming practices : The array of structs (AoS) approach is a common programming practice. While performing computations upon the array if all elements of the struct are not referenced in close proximity, it could cause poor cache utilisation. A relevant example can be seen in Listing \ref{src:bscholes}.
+  \item Programming practices : The array of structs (AoS) approach is a common programming practice. While performing computations upon the array if all elements of the struct are not referenced in close proximity, it could cause poor cache utilisation. A relevant example can be seen in listing \ref{src:bscholes}.
   \item Incorrect assumptions about hardware : Hardware conscious code which attempts to optimise for cache behaviour based on assumptions should be ported carefully. We found \textbf{streamcluster} of the PARSEC application suite, by default, attempt to optimise cache behaviour for 32 byte cache line sizes. This finding was also reported by Liu and Berger\cite{Liu:2011:SPD:2048066.2048070}.
   \item Compiler directives : For better cache performance, sometimes compilers can attempt to allocate aligned blocks of memory. This functionality is exported to the programmer as \code{posix\_memalign} by \textit{GCC}, \code{\_\_aligned\_malloc} by \textit{MSVC} and \code{ippMalloc} by \textit{ICC}. These allocators may leave gaps filled with garbage values which are picked up by the cache when an entire line is fetched, thus reducing the effective caching capacity and reducing utilization.
   \item Interaction with cache geometry : Due to the set associative nature of conventional caches, a set can only contain a fixed number of ways. For instance, if a large amount of data is accessed in a strided fashion which happens to map to the same set, will cause evictions even though there may be space available for use in the other sets of the cache. This shortens the lifetime of the cache blocks in the selected set and may reduce utilization.
@@ -187,6 +187,37 @@ Applications display poor cache utilization due to inefficient data structure ac
 \end{lstlisting}
 \end{minipage}
 
+\begin{figure}[ht]
+
+  \subfloat[64K - Low]{
+    \includegraphics[width=0.48\textwidth]{files/Plots/05-Scatter_Bw_Miss_64K_low.pdf}
+  }
+  \subfloat[1M - Low]{
+     \includegraphics[width=0.48\textwidth]{files/Plots/05-Scatter_Bw_Miss_1M_low.pdf}
+  }
+  
+  \subfloat[64K - Moderate]{
+    \includegraphics[width=0.48\textwidth]{files/Plots/05-Scatter_Bw_Miss_64K_mod.pdf}
+  }
+  \subfloat[1M - Moderate]{
+     \includegraphics[width=0.48\textwidth]{files/Plots/05-Scatter_Bw_Miss_1M_mod.pdf}
+  }
+    
+  \subfloat[64K - High]{
+    \includegraphics[width=0.48\textwidth]{files/Plots/05-Scatter_Bw_Miss_64K_high.pdf}
+  }
+  \subfloat[1M - High]{
+     \includegraphics[width=0.48\textwidth]{files/Plots/05-Scatter_Bw_Miss_1M_high.pdf}
+  }
+
+  \caption[Bandwidth vs. Miss Rate]{Bandwidth vs. Miss Rate. (a),(c),(e): 64K, 4-way
+    L1. (b),(d),(f): 1M, 8-way LLC.  Markers on the plot indicate cache
+    block size. Note the different scales for different groups.}
+  \label{fig:scatter_bw_64k_1m}
+\end{figure}
+
+\clearpage
+
 \subsection{Effect of Block Granularity on Miss Rate and Bandwidth}
 
 Cache miss rate directly correlates with performance, while under
@@ -207,8 +238,6 @@ The bandwidth is increased by 2$\times$ for the Low and Moderate.
 
 \input{files/Tables/benchmark-bwmr-64k.tex}
 
-% SK- Apache 3x miss rate drop not observed anymore. Occured due to
-% different length warmup for Oracle and Fixed runs.
 
 Since miss rate and bandwidth have different optimal block
 granularities, we use the following metric: $\frac{1}{Miss Rate \times
@@ -251,35 +280,6 @@ in an application. In summary:
 \end{itemize}
 
 
-\begin{figure}[t]
-
-  \subfloat[64K - Low]{
-    \includegraphics[width=0.48\textwidth]{files/Plots/05-Scatter_Bw_Miss_64K_low.pdf}
-  }
-  \subfloat[1M - Low]{
-     \includegraphics[width=0.48\textwidth]{files/Plots/05-Scatter_Bw_Miss_1M_low.pdf}
-  }
-  
-  \subfloat[64K - Moderate]{
-    \includegraphics[width=0.48\textwidth]{files/Plots/05-Scatter_Bw_Miss_64K_mod.pdf}
-  }
-  \subfloat[1M - Moderate]{
-     \includegraphics[width=0.48\textwidth]{files/Plots/05-Scatter_Bw_Miss_1M_mod.pdf}
-  }
-    
-  \subfloat[64K - High]{
-    \includegraphics[width=0.48\textwidth]{files/Plots/05-Scatter_Bw_Miss_64K_high.pdf}
-  }
-  \subfloat[1M - High]{
-     \includegraphics[width=0.48\textwidth]{files/Plots/05-Scatter_Bw_Miss_1M_high.pdf}
-  }
-
-  \caption[Bandwidth vs. Miss Rate]{Bandwidth vs. Miss Rate. (a),(c),(e): 64K, 4-way
-    L1. (b),(d),(f): 1M, 8-way LLC.  Markers on the plot indicate cache
-    block size. Note the different scales for different groups.}
-  \label{fig:scatter_bw_64k_1m}
-\end{figure}
-
 \section{Dissertation Outline}
 
-Chapter \ref{chap:ac_architecture} describes the \AC\ architecture whilst comparing it with conventional architecture and looking at related work. The experimental setup and implementation of the simulator are described in Chapter \ref{chap:implementation}. The experimental results of an exhaustive evaluation of the \AC\ is presented in Chapter \ref{chap:evaluation}. Conclusions and future work are outlined in Chapter \ref{chap:conclusions}.
+\unindentChapter \ref{chap:ac_architecture} describes the \AC\ architecture whilst comparing it with conventional architecture and looking at related work. The hardware complexity, implementation issues and simulator infrastructure are discussed in Chapter \ref{chap:hardware_complexity_and_simulation}. The experimental results of an exhaustive evaluation of the \AC\ is presented in Chapter \ref{chap:evaluation}. Conclusions and future work are outlined in Chapter \ref{chap:conclusions}.

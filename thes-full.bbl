@@ -37,4 +37,8 @@ Diego~R. Llanos.
   measurement of computer systems.
 \newblock {\em SIGMOD Rec.}, 35(4):6--15, December 2006.
 
+\bibitem{patent:DataCacheWayPrediction}
+CA~US) Mylavarapu, Ajit Karthik (Mountain~View.
+\newblock Data cache way prediction, February 2010.
+
 \end{thebibliography}
