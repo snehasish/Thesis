@@ -1,4 +1,4 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
 
 \bibitem{Bienia:2008:PBS:1454115.1454128}
 Christian Bienia, Sanjeev Kumar, Jaswinder~Pal Singh, and Kai Li.
@@ -19,6 +19,13 @@ Stephen~M. Blackburn, Robin Garner, Chris Hoffmann, Asjad~M. Khang, Kathryn~S.
   Object-oriented programming systems, languages, and applications}, OOPSLA
   '06, pages 169--190, New York, NY, USA, 2006. ACM.
 
+\bibitem{Kedzierski-ipdps-2010}
+K.~Kedzierski, M.~Moreto, F.J. Cazorla, and M.~Valero.
+\newblock Adapting cache partitioning algorithms to pseudo-lru replacement
+  policies.
+\newblock In {\em Parallel Distributed Processing (IPDPS), 2010 IEEE
+  International Symposium on}, pages 1--12, April 2010.
+
 \bibitem{liptay68}
 J.~S. Liptay.
 \newblock Structural aspects of the system/360 model 85: Ii the cache.
@@ -37,8 +44,25 @@ Diego~R. Llanos.
   measurement of computer systems.
 \newblock {\em SIGMOD Rec.}, 35(4):6--15, December 2006.
 
+\bibitem{manual:OpenSparcT1}
+Sun Microsystems.
+\newblock Opensparc t1 processor megacell specification, 2007.
+
 \bibitem{patent:DataCacheWayPrediction}
-CA~US) Mylavarapu, Ajit Karthik (Mountain~View.
-\newblock Data cache way prediction, February 2010.
+Ajit~Karthik Mylavarapu.
+\newblock Patent 20100049912 : Data cache way prediction, February 2010.
+
+\bibitem{qureshi-isca-2007}
+Moinuddin~K. Qureshi, Aamer Jaleel, Yale~N. Patt, Simon~C. Steely, and Joel
+  Emer.
+\newblock Adaptive insertion policies for high performance caching.
+\newblock In {\em Proceedings of the 34th annual international symposium on
+  Computer architecture}, ISCA '07, pages 381--391, New York, NY, USA, 2007.
+  ACM.
+
+\bibitem{patent:WayPredictionVirtualHint}
+Meng-Bing Yu, Era~K. Nangia, Michael Ni, and Vidya Rajagopalan.
+\newblock Patent 7594079 : Data cache virtual hint way prediction, and
+  applications thereof, September 2009.
 
 \end{thebibliography}

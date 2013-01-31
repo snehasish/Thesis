@@ -1,5 +1,5 @@
 %!TEX root=/home/ska124/Dropbox/Thesis/thes-full.tex
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %     Chapter 3   
 %
@@ -66,7 +66,7 @@ The \AC\ data array holds a collection of varied granularity \AB{}s that do not 
 
 \section{Data Lookup}
 
-When data is referenced by the CPU, a cache lookup takes place in order to determine whether the required datum is present in the cache or not (resulting in a cache hit or miss). The operation percolates down the memory hierarchy until a cache returns a hit or the backing store supplies the datum required. Fig~\ref{fig:set_assoc_arch} shows a conventional cache which operates in \textit{Fast Mode}, where the contents of the entire set is read out into the output buffer in parallel with the tag lookup. Megabyte sized caches, with larger sets, may want to avoid the extra cost of reading out all ways to the output buffer and wait until the tag lookup completes to read out only the correct way from the set. Though this saves energy, it serializes the lookup and takes longer. The delay is usually tolerated as the \textit{Serial Mode} lookup is often implemented in the L2 caches or lower in the memory heirarchy. Another approach which minimises the energy whilst still reading out the way in parallel is \textit{way prediction}\cite{patent:DataCacheWayPrediction}, commonly used in processors manufactured by MIPS.
+When data is referenced by the CPU, a cache lookup takes place in order to determine whether the required datum is present in the cache or not (resulting in a cache hit or miss). The operation percolates down the memory hierarchy until a cache returns a hit or the backing store supplies the datum required. Fig~\ref{fig:set_assoc_arch} shows a conventional cache which operates in \textit{Fast Mode}, where the contents of the entire set is read out into the output buffer in parallel with the tag lookup. Megabyte sized caches, with larger sets, may want to avoid the extra cost of reading out all ways to the output buffer and wait until the tag lookup completes to read out only the correct way from the set. Though this saves energy, it serializes the lookup and takes longer. The delay is usually tolerated as the \textit{Serial Mode} lookup is often implemented in the L2 caches or lower in the memory heirarchy. Another approach which minimises energy whilst still reading out the way in parallel is \textit{way prediction}\cite{patent:DataCacheWayPrediction,patent:WayPredictionVirtualHint}, commonly used in processors manufactured by MIPS.
 \\
 
 In contrast to a conventional cache, the \AC\ needs to lookup tags from the SRAM array to determine a hit or miss. The metadata stored in the \code{T? Bitmap} is used during the lookup operation in the \AC{}. Figure~\ref{fig:ac_lookup} describes the steps of the lookup procedure in an \AC{}. The overheads incurred due to the extra stages introduced in the critical path are evaluated in chapter \ref{sec:hardware_complexity}.
@@ -75,35 +75,30 @@ In contrast to a conventional cache, the \AC\ needs to lookup tags from the SRAM
 \begin{figure}[h]
   \includegraphics[width=\textwidth]{files/Figures/06-Lookup.pdf}
   \caption[Amoeba Cache Lookup]{\textbf{Amoeba Cache Lookup} : The incoming effective address is segmented into the region tag, set index and word offset. \bigspot{1} The \code{Tag? Bitmap} is looked up to determine which words in the activated set are required for the tag comparison. Note that given the minimum size of a \AB{} is two words (1 word for the tag metadata, 1 word for the data), adjacent words cannot be tags. Given this constraint, 
-  the number of 2-1 multiplexers required to route one of the adjacent words to the comparator ($\in$ operator), is equal to half the number of words in the set. \bigspot{2} Simultaneously, the set is activated and the contents are latched onto the output buffer. \bigspot{3} The appropriate tag words are selected with the input from the the \code{Tag? Bitmap}. \bigspot{4} The comparator generates the hit signal for the word selector. The $\in$ operator consists of two comparators: a) an aligned \code{Region tag} comparator, a conventional $==$ (64 - $log_2N_{sets}$ - $log_2{RMAX}$ bits wide, e.g., 50 bits) that checks if the \AB{} belongs to the same region and b) a $ Start <= W < END $ range comparator ($log_2RMAX$ bits wide; e.g., 3 bits) that checks if the \AB\ holds the required word. Finally, in \bigspot{5}, the tag match activates and selects the appropriate word.}
+  the number of 2-1 multiplexers required to route one of the adjacent words to the comparator ($\in$ operator), is equal to half the number of words in the set. \bigspot{2} Simultaneously, the set is activated and the contents are latched onto the output buffer. \bigspot{3} The appropriate tag words are selected with the input from the the \code{Tag? Bitmap}. \bigspot{4} The comparator generates the hit signal for the word selector. The $\in$ operator consists of two comparators: a) an aligned \code{Region tag} comparator, a conventional $==$ (64 - $log_2N_{sets}$ - $log_2{RMAX}$ bits wide, e.g., 50 bits) that checks if the \AB{} belongs to the same region and b) a $ Start <= W < END $ range comparator ($log_2RMAX$ bits wide; e.g., 3 bits) that checks if the \AB\ holds the required word. Finally, in \bigspot{5}, the tag match activates and selects the appropriate word. The critical path (as indicated on the left) includes the read out from the set, the tag selectors and the $\in$ operation.}
   \label{fig:ac_lookup}
 \end{figure}
 
 \clearpage
 
-\section{Amoeba Block Insertion}
+\section{Block Insertion}
 
-On a miss for the desired word, a spatial granularity predictor is invoked (see Section~\ref{sec:predictors}), which specifies the range of the \AB{} to refill. To determine a position in the set to slot the incoming block we can leverage the \code{Valid? Bitmap}. The \code{V? Bitmap} has 1 bit/word in the cache; a ``1'' bit indicates the word has been allocated (valid data or a tag). To find space for an incoming data block we perform a substring search on the \code{V? Bitmap} of the cache set for contiguous 0s (empty words). For example, to insert an \AB{} of five words (four words for data and one word for tag), we perform a substring search for \textit{00000} in the \code{V? Bitmap} / set (e.g., 32 bits wide for a 64K cache). If we cannot find the space, we keep triggering the replacement algorithm until we create the requisite contiguous space. Following this, the \AB\ tuple (Tag and Data block) is inserted, and the corresponding bits in the \code{T? and V? Bitmaps} are set. The 0s substring search can be accomplished with a lookup table; many current processors already include a substring instruction. Intel SSE 4.2 include the instruction, \code{PCMPISTRI}, which can accomplish the required task.
+On a miss for the desired word, a spatial granularity predictor is invoked (see Section~\ref{sec:spatial_pattern_predictor}), which specifies the range of the \AB{} to refill. To determine a position in the set to slot the incoming block we can leverage the \code{Valid? Bitmap}. The \code{V? Bitmap} has 1 bit/word in the cache; a ``1'' bit indicates the word has been allocated (valid data or a tag). To find space for an incoming data block we perform a substring search on the \code{V? Bitmap} of the cache set for contiguous 0s (empty words). For example, to insert an \AB{} of five words (four words for data and one word for tag), we perform a substring search for \textit{00000} in the \code{V? Bitmap} / set (e.g., 32 bits wide for a 64K cache). If we cannot find the space, we keep triggering the replacement algorithm until we create the requisite contiguous space. Following this, the \AB\ tuple (Tag and Data block) is inserted, and the corresponding bits in the \code{T? and V? Bitmaps} are set. The 0s substring search can be accomplished with a lookup table; many current processors already include a substring instruction. Intel SSE 4.2 include the instruction, \code{PCMPISTRI}, which can accomplish the required task.
 
-% \subsection{Replacement : Pseudo LRU}
+\section{Replacement Policy}
 
-% To reclaim the space from an \AB\, the tag bits T? (tag)
-% and V? (valid) bits corresponding to the block are unset. The key issue is
-% identifying the \AB\ to replace. Classical pseudo-LRU algorithms~\cite
-% {Kedzierski-ipdps-2010,opensparct2,Kedzierski-ipdps-2010} keep the metadata
-% for the replacement algorithm separate from the tags to reduce port
-% contention.  \REVIEW{To be compatible with pseudo-LRU and other 
-% algorithms such as DIP~\cite{qureshi-isca-2007} that work with a fixed 
-% \# of ways, we can 
-% logically partition a set in \AC\ into $N_{ways}$. For instance, if we
-% partition a 32 word cache set into 4 logical ways, any access to
-% an \AB\ tag found in words 0 ---7 of the set is treated as an access to
-% logical way 0. Finding a replacement candidate involves identifying the
-% selected replacement way and then picking (possibly randomly) a candidate \AB{}
-% . More refined replacement algorithms that require per-tag metadata can
-% harvest the space in the tag-word of the \AB\, which is 64 bits wide (for
-%   alignment purposes) while physical addresses rarely extend beyond 48 bits.}
+The replacement policy of a cache determines which blocks are evicted when new data is brought in and there is no room to store it. The replacement algorithm tries to make an optimal choice where it evicts a blocks which is not expected to be used in the near future. The most optimal choice possible would be to remove a block which is not going to be referenced in the program again or which is going to be referenced farthest in the future in comparison to the other cache blocks. The optimal algorithm is also known as \textit{"Belady's Optimal Algorithm"}, named after Hungarian computer scientist, Laszlo Belady.
+\\
 
+The Least Recently Used (LRU) algorithm is a popular choice for conventional caches and is based on the principle of temporal locality of reference. The hardware tracks data reference to the different cache blocks and when a new insertion request arrives, the least recently used block in the set is evicted. Implementing an LRU cache in software is relatively easy with the use of a linked list however, in hardware requires a large amount of resources. Thus hardware manufactureres commonly implement the \textit{Pseudo-LRU}(PLRU) which has a lower metadata overhead and is a reasonable approximation of LRU. The tree based PLRU was implemented in processors such as the Intel 80486 and many processors in the PowerPC family. 
+
+\subsection{\AC\ Replacement Policy}
+
+To reclaim the space from an \AB\, the tag bits T? (tag) and V? (valid) bits corresponding to the block are unset. The key issue is identifying the \AB\ to replace. Classical pseudo-LRU algorithms~\cite{Kedzierski-ipdps-2010,manual:OpenSparcT1} keep the metadata for the replacement algorithm separate from the tags to reduce port contention. To be compatible with pseudo-LRU and other algorithms such as DIP~\cite{qureshi-isca-2007} that work with a fixed \# of ways, we can logically partition a set in \AC\ into $N_{ways}$. For instance, if we partition a 32 word cache set into 4 logical ways, any access to an \AB\ tag found in words 0 ---7 of the set is treated as an access to logical way 0. Finding a replacement candidate involves identifying the selected replacement way and then picking (possibly randomly) a candidate \AB{}. 
+
+\subsection{Other Replacement Policies}
+
+More refined replacement algorithms that require per-tag metadata can harvest the space in the tag-word of the \AB\, which is 64 bits wide (for alignment purposes) while physical addresses rarely extend beyond 48 bits.
 
 
 % \subsection{Partial Misses} \label{sec:partialmiss} 
@@ -153,36 +148,11 @@ On a miss for the desired word, a spatial granularity predictor is invoked (see 
 % \label{fig:partial-miss}
 % \end{figure}
 
-
-
-
-% % \REVIEW{ Operations such as partial misses, replacements and invalidations,
-% % which may require multiple steps, are modeled faithfully by the protocol. The
-% % block is marked with state, $IV_C$ (a transient state) and separate protocol
-% % events are triggered for each step. (see Section~\ref{sec:eval} for our
-% % methodology). }
-
-% %% Looking up the tag requires reading the data array.  This is extra
-% %% energy cost. We may also need a lot of comparators.  Key question is
-% %% how many comparators do you need. You don't want to provision too
-% %% many. To minimize the \# of comparators needed in the common case we
-% %% add filters to restrict the tag lookup when needed for a subset of the
-% %% accesses.  We discuss two kinds of filters (1) Fast Tags : cache the
-% %% tags themselves in a conventional tag array-like structure and with a
-% %% pointer into the data array. A hit in this array ensures fast lookup.
-
-
-% % \REVIEW{  The tags
-% % collocated in the data array need to be touched during cache lookup and
-% % insertion operations. Additionally they may need to be accessed during
-% % coherence snoops at the L1, though our studies show that these operations are
-% % infrequent (e.g., 1/100 cache operations in SpecJBB) and the directory and
-% % inclusive LLC filter out most of the snoops. The proposed \textit{Fast Tags}
-% % (Section~\ref{sec:extensions}) also act as a filter.}
-
-
 \section{Spatial Pattern Predictor}
+\label{sec:spatial_pattern_predictor}
+
 \section{Related Work}
 \subsection{Line Distillation}
 \subsection{Sector Caches}
 \subsection{Indexed Indirect Caches}
+\subsection{Cache Compression}

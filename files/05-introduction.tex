@@ -17,7 +17,7 @@ Memory systems are an integral part of computer architecture whose overall desig
 
 In modern systems, with multiple levels in their memory hierarchy, a couple of levels closest to the processor are made from static random access memory (SRAM) which increase in size as the distance from the processor increases. These are placed on the same die as the processor chip. To service a memory request not present in the previous levels, a request is sent off chip to fetch the data from main memory, constructed from dynamic random access memory (DRAM). The main memory is usually several magnitudes of order larger than the largest cache present on the chip. This can be afforded by the lower cost of DRAM compared to SRAM. However, DRAM lookups are slower and require more power to retain data. The speed, cost and size for each level in the memory hierarchy can be visualized as shown in Fig \ref{fig:memory_hierarchy}.
 
-\begin{figure}[h]
+\begin{figure}[ht]
   %% Overview Cache Hierarchy
   \begin{center}
     \includegraphics[width=\textwidth]{files/Figures/05-MemoryHierarchy.pdf}
@@ -282,4 +282,4 @@ in an application. In summary:
 
 \section{Dissertation Outline}
 
-\unindentChapter \ref{chap:ac_architecture} describes the \AC\ architecture whilst comparing it with conventional architecture and looking at related work. The hardware complexity, implementation issues and simulator infrastructure are discussed in Chapter \ref{chap:hardware_complexity_and_simulation}. The experimental results of an exhaustive evaluation of the \AC\ is presented in Chapter \ref{chap:evaluation}. Conclusions and future work are outlined in Chapter \ref{chap:conclusions}.
+Chapter \ref{chap:ac_architecture} describes the \AC\ architecture whilst comparing it with conventional architecture and looking at related work. The hardware complexity, implementation issues and simulator infrastructure are discussed in Chapter \ref{chap:hardware_complexity_and_simulation}. The experimental results of an exhaustive evaluation of the \AC\ is presented in Chapter \ref{chap:evaluation}. Conclusions and future work are outlined in Chapter \ref{chap:conclusions}.
