@@ -19,12 +19,35 @@ Stephen~M. Blackburn, Robin Garner, Chris Hoffmann, Asjad~M. Khang, Kathryn~S.
   Object-oriented programming systems, languages, and applications}, OOPSLA
   '06, pages 169--190, New York, NY, USA, 2006. ACM.
 
+\bibitem{chen-hpca-2004}
+Chi~F. Chen, Se-Hyun Yang, Babak Falsafi, and Andreas Moshovos.
+\newblock Accurate and complexity-effective spatial pattern prediction.
+\newblock In {\em Proceedings of the 10th International Symposium on High
+  Performance Computer Architecture}, HPCA '04, pages 276--, Washington, DC,
+  USA, 2004. IEEE Computer Society.
+
+\bibitem{Chilimbi-Hill-pldi-1999}
+Trishul~M. Chilimbi, Mark~D. Hill, and James~R. Larus.
+\newblock Cache-conscious structure layout.
+\newblock In {\em Proceedings of the ACM SIGPLAN 1999 conference on Programming
+  language design and implementation}, PLDI '99, pages 1--12, New York, NY,
+  USA, 1999. ACM.
+
+\bibitem{manual:IntelProcessor}
+Intel Corporation.
+\newblock Intel embedded pentium processor family dev. manual, 1998.
+
 \bibitem{Kedzierski-ipdps-2010}
 K.~Kedzierski, M.~Moreto, F.J. Cazorla, and M.~Valero.
 \newblock Adapting cache partitioning algorithms to pseudo-lru replacement
   policies.
 \newblock In {\em Parallel Distributed Processing (IPDPS), 2010 IEEE
   International Symposium on}, pages 1--12, April 2010.
+
+\bibitem{kumar-isca-1998}
+Sanjeev Kumar and Christopher Wilkerson.
+\newblock Exploiting spatial locality in data caches using spatial footprints.
+\newblock {\em SIGARCH Comput. Archit. News}, 26(3):357--368, April 1998.
 
 \bibitem{liptay68}
 J.~S. Liptay.
@@ -51,6 +74,12 @@ Sun Microsystems.
 \bibitem{patent:DataCacheWayPrediction}
 Ajit~Karthik Mylavarapu.
 \newblock Patent 20100049912 : Data cache way prediction, February 2010.
+
+\bibitem{pujara-hpca-2006}
+P.~Pujara and A.~Aggarwal.
+\newblock Increasing the cache efficiency by eliminating noise.
+\newblock In {\em High-Performance Computer Architecture, 2006. The Twelfth
+  International Symposium on}, pages 145 -- 154, feb. 2006.
 
 \bibitem{qureshi-isca-2007}
 Moinuddin~K. Qureshi, Aamer Jaleel, Yale~N. Patt, Simon~C. Steely, and Joel

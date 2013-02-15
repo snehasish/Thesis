@@ -90,66 +90,51 @@ On a miss for the desired word, a spatial granularity predictor is invoked (see 
 The replacement policy of a cache determines which blocks are evicted when new data is brought in and there is no room to store it. The replacement algorithm tries to make an optimal choice where it evicts a blocks which is not expected to be used in the near future. The most optimal choice possible would be to remove a block which is not going to be referenced in the program again or which is going to be referenced farthest in the future in comparison to the other cache blocks. The optimal algorithm is also known as \textit{"Belady's Optimal Algorithm"}, named after Hungarian computer scientist, Laszlo Belady.
 \\
 
-The Least Recently Used (LRU) algorithm is a popular choice for conventional caches and is based on the principle of temporal locality of reference. The hardware tracks data reference to the different cache blocks and when a new insertion request arrives, the least recently used block in the set is evicted. Implementing an LRU cache in software is relatively easy with the use of a linked list however, in hardware requires a large amount of resources. Thus hardware manufactureres commonly implement the \textit{Pseudo-LRU}(PLRU) which has a lower metadata overhead and is a reasonable approximation of LRU. The tree based PLRU was implemented in processors such as the Intel 80486 and many processors in the PowerPC family. 
+The Least Recently Used (LRU) algorithm is a popular choice for conventional caches and is based on the principle of temporal locality of reference. The hardware tracks data reference to the different cache blocks and when a new insertion request arrives, the least recently used block in the set is evicted. Implementing an LRU cache in software is relatively easy with the use of a linked list. Hardware manufacturers commonly implement the \textit{Pseudo-LRU}(PLRU) which has a lower metadata overhead and is a reasonable approximation of LRU. The tree based PLRU was implemented in processors such as the Intel 80486 and many processors in the PowerPC family. 
+
+\subsection{Pseudo-LRU}
+
+The tree based Pseudo-LRU algorithm was developed as an approximation of LRU due to the exponentially increasing complexity of storing the LRU state for increasing number of ways (an $N_{way}$ cache would require $N!$ states). For multi threaded processor designs and megabyte sized caches, it is often desirable to have a high level of associativity. For Pseudo-LRU, one bit indicates whether the most recent reference is to a line in either the first half or the second half of the lines in a set; then, this technique is logically applied recursively, resulting in a logical binary tree with N-1 nodes (thus N-1 bits are required to represent a state in tree-PLRU). A 4-way set associative can be encoded for PLRU replacement with 3 bits. Each bit represents one branch point in a binary decision tree; let 1 represent that the left side has been referenced more recently than the right side, and 0 vice-versa. 
+\\ 
+\begin{figure}[hb]
+  \includegraphics[width=\textwidth]{files/Figures/06-PLRU.pdf}
+  \\
+  \caption[Pseudo LRU]{\textbf{Pseudo-LRU decision tree and state transition table} : The flowchart on the left shows the decision making process based on the values of the 3 PLRU bits in a 4-way associative cache. The state transition tables on the right are (a) way to replace for given state (b) state to transition to on reference to a way. Reproduced from Intel Embedded Pentium Processor Family Dev. Manual\cite{manual:IntelProcessor}.}
+  \label{fig:plru}
+\end{figure}
 
 \subsection{\AC\ Replacement Policy}
 
-To reclaim the space from an \AB\, the tag bits T? (tag) and V? (valid) bits corresponding to the block are unset. The key issue is identifying the \AB\ to replace. Classical pseudo-LRU algorithms~\cite{Kedzierski-ipdps-2010,manual:OpenSparcT1} keep the metadata for the replacement algorithm separate from the tags to reduce port contention. To be compatible with pseudo-LRU and other algorithms such as DIP~\cite{qureshi-isca-2007} that work with a fixed \# of ways, we can logically partition a set in \AC\ into $N_{ways}$. For instance, if we partition a 32 word cache set into 4 logical ways, any access to an \AB\ tag found in words 0 ---7 of the set is treated as an access to logical way 0. Finding a replacement candidate involves identifying the selected replacement way and then picking (possibly randomly) a candidate \AB{}. 
+To reclaim the space from an \AB\, the tag bits T? (tag) and V? (valid) bits corresponding to the block are unset. The key issue is identifying the \AB\ to replace. Classical pseudo-LRU algorithms~\cite{Kedzierski-ipdps-2010,manual:OpenSparcT1} keep the metadata for the replacement algorithm separate from the tags to reduce port contention. To be compatible with pseudo-LRU and other algorithms such as DIP~\cite{qureshi-isca-2007} that work with a fixed number of ways, we can logically partition a set in \AC\ into $N_{ways}$. For instance, if we partition a 32 word cache set into 4 logical ways, any access to an \AB\ tag found in words 0 ---7 of the set is treated as an access to logical way 0. Finding a replacement candidate involves identifying the selected replacement way and then picking (possibly randomly) a candidate \AB{}. This procedure is repeated until the required amount of space is made available. More refined replacement algorithms that require per-tag metadata can harvest the space in the tag-word of the \AB\, which is 64 bits wide (for alignment purposes) while physical addresses rarely extend beyond 48 bits.
 
-\subsection{Other Replacement Policies}
+\section{Partial Misses} 
+\label{sec:partialmiss} 
 
-More refined replacement algorithms that require per-tag metadata can harvest the space in the tag-word of the \AB\, which is 64 bits wide (for alignment purposes) while physical addresses rarely extend beyond 48 bits.
+With variable granularity data blocks, a challenging although rare case (5 in every 1K accesses) that occurs is a \textit{partial miss}. It is observed primarily when the spatial locality changes.  Figure~\ref{fig:partial-miss} shows an example. Initially, the set contains two blocks from the region R, one \AB\ caches words 0 --- 2 (Region:R Start:0 End:2) and the other caches words 6 and 7 (Region:R Start:6 End:7). Let us assume that the CPU reads word 4, which misses, and the spatial pattern predictor requests an \AB\ with range Start:0 and End:7. The cache has \AB{}s that hold subparts of the incoming \AB{}, and only some words (4,5 and 5) need to be fetched.
 
+\begin{figure}[h]
+  \includegraphics[width=\textwidth]{files/Figures/06-PartialMiss.pdf}
+  \\
+  \caption[Partial Miss]{\textbf{Partial miss processing} : The partial miss processing is shown as 2 separate stages. Stage 1 deals with the identification and eviction (to MSHR) of all overlapping blocks. Stage 2 issues the miss, allocates space for the new \AB\ and patches in the missing words from a lower level in the memory hierarchy before copying the data back into the cache set. Due to the infrequent nature of partial misses we do not optimise for fetching only the missing words in our implementation. }
+  \label{fig:partial-miss}
+\end{figure}
 
-% \subsection{Partial Misses} \label{sec:partialmiss} 
+\clearpage
 
-% With variable granularity data blocks, a challenging although rare case (5
-% in every 1K accesses) that occurs is a \textit{partial miss}. It is observed
-% primarily when the spatial locality changes.  Figure~\ref{fig:partial-miss}
-% shows an example. Initially, the set contains two blocks from a region R, one
-% \AB\ caches words 1 --3 (Region:R, START:1 END:3) and the other holds words 5
-% --6 (Region:R START:5 END:6). The CPU reads word 4, which
-% misses, and the spatial predictor requests an \AB\ with range START:0 and
-% END:7. The cache has \AB{}s that hold subparts of the incoming \AB{}, and some
-% words (0, 4, and 7) need to be fetched.
-
-% \AC\ removes the overlapping sub-blocks and allocates a new \AB{}. This is a
-% multiple step process:\spot{1} On a miss, the cache identifies the overlapping
-% sub-blocks in the cache using the tags read out during lookup. $\cap \neq
-% NULL$ is true if $START_{new}$ < $END_{Tag}$ and $END_{new}$ > $START_{Tag}$
-% ($New=$ incoming block and $Tag=$ \AB\ in set).  \spot{2} The data blocks that
-% overlap with the miss range are evicted and moved one-at-a-time to the MSHR
-% entry. \spot{3} Space is then allocated for the new block, i.e.,
-% it is treated like a new insertion. \spot{4} A miss request is issued for the
-% entire block (START:0 --- END:7) even if only some words (e.g., 0, 4, and 7)
-% may be needed. This ensures request processing is simple and only a single
-% refill request is sent.\spot{5} Finally, the incoming data block is patched
-% into the MSHR; only the words not obtained from the L1 are copied (since the
-% lower level could be stale).
-
-
-% \begin{figure}[!h]
-% \centering
-% \includegraphics[width=0.37\textwidth]{figures/PartialMiss}
-% \begin{minipage}[b]{0.5\textwidth} 
-% { 
-% \centering \spot{1}
-%     Identify blocks overlapping with \code{New} block. \spot{2}
-%     Evict overlapping blocks to MSHR. \spot{3} Allocate space
-%     for new block (treat it like a new insertion). \spot{4} Issue
-%     refill request to lower level for entire block. \spot{5} Patch
-%     only newer words as lower-level data could be stale.  
-% %(e.g., writeback cache)
-% }
-% \end{minipage}
-% \caption{Partial Miss Handling. Upper: Identify relevant
-%   sub-blocks. Useful for other cache controller events as well, e.g.,
-%   recalls. Lower: Refill of words and insertion.}
-% \label{fig:partial-miss}
-% \end{figure}
+\AC\ removes the overlapping sub-blocks and allocates a new \AB{}. This is a multiple step process: \bigspot{1} On a miss, the cache identifies the overlapping sub-blocks in the cache using the tags read out during lookup. The $\cap$(in) operation returns false if there are no overlapping blocks. The $\cap$ operation consists of an equality check for the region (R), $Start_{New} \leq End_{Tag}$ and $End_{New} > Start_{Tag}$ (where \textit{New} refers to the fetch request from the spatial pattern predictor and \textit{Tag} refers to the existing \AB{}). \bigspot{2} The data blocks that overlap with the miss range are evicted and moved one-at-a-time to the miss status holding register (MSHR) entry. \bigspot{3} Space is then allocated for the new block, i.e., it is treated like a new insertion. A miss request is issued for the entire block (Start:0 --- End:7) even if only some words (e.g., 3, 4 and 5) may be needed. This ensures request processing is simple and only a single refill request is sent. \bigspot{4} The incoming data block is patched into the MSHR; only the words not obtained from the L1 (words 3,4 and 5 as indicated in Fig\ref{fig:partial-miss}) are copied (since the lower level could be stale). \bigspot{5} The entire block is copied back into the SRAM array.
 
 \section{Spatial Pattern Predictor}
 \label{sec:spatial_pattern_predictor}
+
+\AC\ needs a spatial block predictor, which  informs refill requests about the range of the block to fetch. \AC\ can exploit any spatial locality predictor and there have been many efforts in the compiler and architecture community~\cite{Chilimbi-Hill-pldi-1999, kumar-isca-1998, pujara-hpca-2006,chen-hpca-2004}. We adopt a table-driven approach consisting of a set of access bitmaps; each entry is \code{RMAX} (maximum granularity of an \AB{}) bits wide and represents whether the word was touched during the lifetime of the recently evicted cache block. On a miss, the predictor will search for an entry (indexed by either the miss PC or region address) and choose the range of words to be fetched on a miss on either side (left and right) of the critical word. The PC-based indexing also ses the critical word index for improved accuracy. The predictor optimizes for spatial prefetching and will  overfetch (bring in potentially untouched words), if they are interspersed amongst contiguous chunks of touched words. We can also bypass the prediction when there is low confidence in the prediction accuracy. For example, for streaming applications without repeated misses to a region, we can bring in a fixed granularity block based on the overall global behavior of the application. We evaluate tradeoffs in the design of the spatial predictor in Section~\ref{sec:predictor_tradeoffs}.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.75\textwidth]{files/Figures/06-Predictor.pdf}
+  \\
+  \caption[Amoeba-Cache Predictor]{\textbf{\AC\ Predictor} :  }
+  \label{fig:predictor}
+\end{figure}
 
 \section{Related Work}
 \subsection{Line Distillation}
