@@ -3,7 +3,7 @@
 %
 %     Chapter 3   
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Amoeba Cache Architecture}
 \label{chap:ac_architecture}
@@ -45,7 +45,7 @@ The \AC\ adopts a solution inspired by software data structures, where programs 
 
 
 \section{Amoeba Blocks and Set-Indexing}
-
+\label{sec:amoeba_blocks_and_set_indexing}
 
 \begin{figure}[h]
   %% Get images from http://en.wikipedia.org/wiki/CPU_cache#Associativity
@@ -126,18 +126,49 @@ With variable granularity data blocks, a challenging although rare case (5 in ev
 \section{Spatial Pattern Predictor}
 \label{sec:spatial_pattern_predictor}
 
-\AC\ needs a spatial block predictor, which  informs refill requests about the range of the block to fetch. \AC\ can exploit any spatial locality predictor and there have been many efforts in the compiler and architecture community~\cite{Chilimbi-Hill-pldi-1999, kumar-isca-1998, pujara-hpca-2006,chen-hpca-2004}. We adopt a table-driven approach consisting of a set of access bitmaps; each entry is \code{RMAX} (maximum granularity of an \AB{}) bits wide and represents whether the word was touched during the lifetime of the recently evicted cache block. On a miss, the predictor will search for an entry (indexed by either the miss PC or region address) and choose the range of words to be fetched on a miss on either side (left and right) of the critical word. The PC-based indexing also ses the critical word index for improved accuracy. The predictor optimizes for spatial prefetching and will  overfetch (bring in potentially untouched words), if they are interspersed amongst contiguous chunks of touched words. We can also bypass the prediction when there is low confidence in the prediction accuracy. For example, for streaming applications without repeated misses to a region, we can bring in a fixed granularity block based on the overall global behavior of the application. We evaluate tradeoffs in the design of the spatial predictor in Section~\ref{sec:predictor_tradeoffs}.
+The \AC\ uses a spatial block predictor, which  informs refill requests about the range of the block to fetch. \AC\ can exploit any spatial locality predictor and there have been many efforts in the compiler and architecture community~\cite{Chilimbi-Hill-pldi-1999, kumar-isca-1998, pujara-hpca-2006,chen-hpca-2004}. We adopt a tabular approach, as shown in Fig~\ref{fig:predictor}, consisting of a set of access bitmaps; each entry is \code{RMAX} (maximum granularity of an \AB{}) bits wide and represents whether the word was touched during the lifetime of the recently evicted cache block. The entry is indexed with information gleaned from either the program counter (PC) which initiated the cache miss or region tag for the effective address or both. On a miss, the predictor will search for an entry  and choose the range of words to be fetched on a miss on either side (left and right) of the critical word. The predictor optimizes for spatial prefetching and will  overfetch (bring in potentially untouched words), if they are interspersed amongst contiguous chunks of touched words. We can also bypass the prediction when there is low confidence in the prediction accuracy, i.e. when there may not be an entry in the table. We evaluate tradeoffs in the design of the spatial predictor in Section~\ref{sec:predictor_tradeoffs}.
+
 
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.75\textwidth]{files/Figures/06-Predictor.pdf}
   \\
-  \caption[Amoeba-Cache Predictor]{\textbf{\AC\ Predictor} :  }
+  \caption[Amoeba-Cache Predictor]{\textbf{\AC\ Predictor} : On a cache miss, the \AC\ predictor performs the following steps. \bigspot{1} Lookup the table using bits from the program counter or region tag or a combination of both. \bigspot{2} If an entry is present for the calculated index, the corresponding bitmap is read out from the table. The bitmap is updated on eviction of a cache block with the pattern of words accessed by the CPU in the cache block during its lifetime. \bigspot{3} We examine the critical word (word requested by the instruction), to ensure it is part of the marked portion of the bitmap. We then extend the range for the new block to include all marked words in the bitmap. \bigspot{4} The predictor then requests the cache to issue a miss for words 0 -- 5 based on the bitmap pattern.}
   \label{fig:predictor}
 \end{figure}
 
 \section{Related Work}
+
+In this section we look at all the prior work in the area which closely relate to the \AC{}. 
+
 \subsection{Line Distillation}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{files/Figures/06-LDIS.pdf}
+  \\
+  \caption[Line Distillation]{\textbf{Line Distillation Organisation} : The figure shows a single set from a 4-way \textit{Distill Cache}. The LOC consists of ways A,B and C and the WOC consists of way D. A line evicted from the LOC ways is checked for suitable words to retain in the WOC. A lookup in the WOC includes a check for the line address as well as the word index to qualify as a hit.}
+  \label{fig:ldis}
+\end{figure}
+
+Qureshi et al\cite{Qureshi:2007:LDIS} proposed a cache organisation dubbed as the \textit{Distill Cache} and a technique known as \textit{Line Distillation} to discard only the unused words from a cache line upon eviction. Their proposed organisation (as shown in Fig~\ref{fig:ldis}) includes a \textit{Line Organised Cache(LOC)} which stores blocks at the default line granularity (such as 64 bytes per line) and a \textit{Word Organised Cache(WOC)} which stores blocks at the granularity of a word (usually 8 bytes). The WOC is similar in spirit to the \textit{Victim Cache}\cite{Jouppi:1990:IDC:325164.325162} proposed by Jouppi. The victim cache is a small, fully associative cache which is usually coupled with a direct mapped cache and stores the victim of a cache miss. It was used to alleviate problems caused by conflict misses. The WOC however, does not cache the entire block. The WOC only caches the words within the cache block which were touched by the application at the time of eviction. Whether the words will be installed in the WOC or the entire line is discarded is determined by the number of words which were touched. The authors propose a \textit{median threshold filtering} policy, where the words are retained in the WOC on eviction only if the number of words touched in the cache line from the LOC is less than the median number of words touched in a cache block in the application. The authors propose the implementation of the \textit{Distill Cache} at the L2 as the design of the L1 data cache is is heavily constrained by cycle time and out of order processors already cover some of the latency of the cache misses. Their findings show an average improvement of 12\% in IPC by reducing cache misses for a 1MB 8-way L2 by 30\%.
+
+The \textit{Distill Cache} is similar to the \AC\ in the sense that in a single cache it supports word granularity blocks and line granularity blocks as two extremes. The \AC\ supports varying granularity blocks of sizes 1--\textit{RMAX} words (see Section~\ref{sec:amoeba_blocks_and_set_indexing}). The WOC always incurs a high overhead in terms of a single tag for each of the data words in the WOC which is similar to the worst case scenario for an \AC\ where all the data words in the cache set are of size 1 word. The \textit{Distill Cache} does not rely on a spatial pattern predictor, whereas a spatal pattern predictor is essetial for the \AC{}.
+
 \subsection{Sector Caches}
+
+The original cache designs\cite{liptay68} were essentially sector caches in nature was due to the technology available at the time (the discrete transistor logic for sectors was easier to implement) where the cache consisted of sectors (address tags) and subsectors (or blocks with valid bits). They were deprecated in favor of set associative caches which have superior performance in terms of miss rate and because many subsectors went unused due to early eviction of a sector.
+\\
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{files/Figures/06-Sector.pdf}
+  \\
+  \caption[Sector Frame]{\textbf{Sector Frame} : Diagram of a single sector frame (reproduced from \cite{Rothman_Smith_2000}). \textit{D} is the dirty bit  and \textit{V} is the valid bit associated with the subsector. The first documented use of a cache in a computing system, the IBM 360/85, was 16 KBytes in size and consisted of 16 sector frames of 16 subsectors, each of size 64 byte blocks.}
+  \label{fig:sector_frame}
+\end{figure}
+
+In the 90's interest in sector cache design was revived by Rothman et al\cite{Rothman_Smith_2000} and Seznec\cite{Seznec-decoupled-sector-cache-isca, seznec:inria-00074588} due to their suitability for large cache design. Sector caches are also desirable due to reduced bus traffic and smaller latency overheads.  The Intel Pentium 4, SUN SPARC and IBM PowerPC G4/G5 all incorporated sector designs into the cache memory hierarchy. The Power7 architecture also employs a sector design at the L2 with 32 bytes per subsector. Sector caches can also be combined with victim caches as proposed by Lai et al\cite{Lai-victim-sector} to reduce miss rates.
+
+Sector caches provide variable granularity caching at the granularity of the subsector size. However, they space freed up by unused subsector cannot be reused by a different sector frame. This outlines the primary difference the sector cache orgranisation and the \AC\ organisation.
+
 \subsection{Indexed Indirect Caches}
-\subsection{Cache Compression}

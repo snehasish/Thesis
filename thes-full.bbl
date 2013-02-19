@@ -37,6 +37,14 @@ Trishul~M. Chilimbi, Mark~D. Hill, and James~R. Larus.
 Intel Corporation.
 \newblock Intel embedded pentium processor family dev. manual, 1998.
 
+\bibitem{Jouppi:1990:IDC:325164.325162}
+Norman~P. Jouppi.
+\newblock Improving direct-mapped cache performance by the addition of a small
+  fully-associative cache and prefetch buffers.
+\newblock In {\em Proceedings of the 17th annual international symposium on
+  Computer Architecture}, ISCA '90, pages 364--373, New York, NY, USA, 1990.
+  ACM.
+
 \bibitem{Kedzierski-ipdps-2010}
 K.~Kedzierski, M.~Moreto, F.J. Cazorla, and M.~Valero.
 \newblock Adapting cache partitioning algorithms to pseudo-lru replacement
@@ -48,6 +56,13 @@ K.~Kedzierski, M.~Moreto, F.J. Cazorla, and M.~Valero.
 Sanjeev Kumar and Christopher Wilkerson.
 \newblock Exploiting spatial locality in data caches using spatial footprints.
 \newblock {\em SIGARCH Comput. Archit. News}, 26(3):357--368, April 1998.
+
+\bibitem{Lai-victim-sector}
+Chunrong Lai and Shih-Lien Lu.
+\newblock Efficient victim mechanism on sector cache organization.
+\newblock In Pen-Chung Yew and Jingling Xue, editors, {\em Advances in Computer
+  Systems Architecture}, volume 3189 of {\em Lecture Notes in Computer
+  Science}, pages 16--29. Springer Berlin / Heidelberg, 2004.
 
 \bibitem{liptay68}
 J.~S. Liptay.
@@ -88,6 +103,32 @@ Moinuddin~K. Qureshi, Aamer Jaleel, Yale~N. Patt, Simon~C. Steely, and Joel
 \newblock In {\em Proceedings of the 34th annual international symposium on
   Computer architecture}, ISCA '07, pages 381--391, New York, NY, USA, 2007.
   ACM.
+
+\bibitem{Qureshi:2007:LDIS}
+Moinuddin~K. Qureshi, M.~Aater Suleman, and Yale~N. Patt.
+\newblock Line distillation: Increasing cache capacity by filtering unused
+  words in cache lines.
+\newblock In {\em Proceedings of the 2007 IEEE 13th International Symposium on
+  High Performance Computer Architecture}, HPCA '07, pages 250--259,
+  Washington, DC, USA, 2007. IEEE Computer Society.
+
+\bibitem{Rothman_Smith_2000}
+J~.B. Rothman and A.J. Smith.
+\newblock {\em Sector cache design and performance}, page 124–133.
+\newblock IEEE Comput. Soc, 2000.
+
+\bibitem{Seznec-decoupled-sector-cache-isca}
+A.~Seznec.
+\newblock Decoupled sectored caches: conciliating low tag implementation cost
+  and low miss ratio.
+\newblock In {\em Proceedings of 21 International Symposium on Computer
+  Architecture}, page 384–393. IEEE Comput. Soc. Press.
+
+\bibitem{seznec:inria-00074588}
+Andr{\'e} Seznec.
+\newblock {Interleaved sectored caches: reconciling low tag volume and low miss
+  ratio}.
+\newblock Rapport de recherche RR-2084, INRIA, 1993.
 
 \bibitem{patent:WayPredictionVirtualHint}
 Meng-Bing Yu, Era~K. Nangia, Michael Ni, and Vidya Rajagopalan.
