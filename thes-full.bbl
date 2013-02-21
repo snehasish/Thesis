@@ -1,5 +1,10 @@
 \begin{thebibliography}{10}
 
+\bibitem{AlameldeenPHD}
+A.~R. Alameldeen.
+\newblock {\em Using Compression to Improve Chip Multiprocessor Performance}.
+\newblock PhD thesis, University of Wisconsin, Madison, 2006.
+
 \bibitem{Bienia:2008:PBS:1454115.1454128}
 Christian Bienia, Sanjeev Kumar, Jaswinder~Pal Singh, and Kai Li.
 \newblock The parsec benchmark suite: characterization and architectural
@@ -33,9 +38,37 @@ Trishul~M. Chilimbi, Mark~D. Hill, and James~R. Larus.
   language design and implementation}, PLDI '99, pages 1--12, New York, NY,
   USA, 1999. ACM.
 
+\bibitem{Choi:2011:DRM:2120965.2121416}
+Byn Choi, Rakesh Komuravelli, Hyojin Sung, Robert Smolinski, Nima Honarmand,
+  Sarita~V. Adve, Vikram~S. Adve, Nicholas~P. Carter, and Ching-Tsun Chou.
+\newblock Denovo: Rethinking the memory hierarchy for disciplined parallelism.
+\newblock In {\em Proceedings of the 2011 International Conference on Parallel
+  Architectures and Compilation Techniques}, PACT '11, pages 155--166,
+  Washington, DC, USA, 2011. IEEE Computer Society.
+
 \bibitem{manual:IntelProcessor}
 Intel Corporation.
 \newblock Intel embedded pentium processor family dev. manual, 1998.
+
+\bibitem{Dubnicki:1992:ABS:139669.139725}
+Czarek Dubnicki and Thomas~J. LeBlanc.
+\newblock Adjustable block size coherent caches.
+\newblock In {\em Proceedings of the 19th annual international symposium on
+  Computer architecture}, ISCA '92, pages 170--180, New York, NY, USA, 1992.
+  ACM.
+
+\bibitem{Hallnor_Reinhardt_2000}
+Erik~G. Hallnor and Steven~K. Reinhardt.
+\newblock A fully associative software-managed cache design.
+\newblock In {\em Proceedings of the 27th annual international symposium on
+  Computer architecture - ISCA ’00}, volume~28, page 107–116. ACM Press,
+  Jun 2000.
+
+\bibitem{Hallnor04acompressed}
+Erik~G. Hallnor and Steven~K. Reinhardt.
+\newblock A compressed memory hierarchy using an indirect index cache.
+\newblock Technical report, in Proc. 3rd workshop on Memory performance issues,
+  2004.
 
 \bibitem{Jouppi:1990:IDC:325164.325162}
 Norman~P. Jouppi.
@@ -129,6 +162,39 @@ Andr{\'e} Seznec.
 \newblock {Interleaved sectored caches: reconciling low tag volume and low miss
   ratio}.
 \newblock Rapport de recherche RR-2084, INRIA, 1993.
+
+\bibitem{Pinnacle:2001}
+R.B. Tremaine, T.B. Smith, M.~Wazlowski, D.~Har, Kwok-Ken Mak, and
+  S.~Arramreddy.
+\newblock Pinnacle: Ibm mxt in a memory controller chip.
+\newblock {\em Micro, IEEE}, 21(2):56 --68, mar/apr 2001.
+
+\bibitem{Veidenbaum:1999:ACL:305138.305188}
+Alexander~V. Veidenbaum, Weiyu Tang, Rajesh Gupta, Alexandru Nicolau, and
+  Xiaomei Ji.
+\newblock Adapting cache line size to application behavior.
+\newblock In {\em Proceedings of the 13th international conference on
+  Supercomputing}, ICS '99, pages 145--154, New York, NY, USA, 1999. ACM.
+
+\bibitem{Watkins:2008:RCB:1505816.1505849}
+Matthew~A. Watkins, Sally~A. Mckee, and Lambert Schaelicke.
+\newblock Revisiting cache block superloading.
+\newblock In {\em Proceedings of the 4th International Conference on High
+  Performance Embedded Architectures and Compilers}, HiPEAC '09, pages
+  339--354, Berlin, Heidelberg, 2009. Springer-Verlag.
+
+\bibitem{Yoon_Jeong_Erez_2011}
+Doe~Hyun Yoon, Min~Kyu Jeong, and Mattan Erez.
+\newblock Adaptive granularity memory systems.
+\newblock In {\em Proceeding of the 38th annual international symposium on
+  Computer architecture - ISCA ’11}, volume~39, page 295. ACM Press, Jun
+  2011.
+
+\bibitem{yoon2012dgms}
+Doe~Hyun Yoon, Min~Kyu Jeong, Michael~B. Sullivan, and Mattan Erez.
+\newblock The dynamic granularity memory system.
+\newblock In {\em Proceedings of the International Symposium on Computer
+  Architecture (ISCA’12)}, June 2012.
 
 \bibitem{patent:WayPredictionVirtualHint}
 Meng-Bing Yu, Era~K. Nangia, Michael Ni, and Vidya Rajagopalan.
