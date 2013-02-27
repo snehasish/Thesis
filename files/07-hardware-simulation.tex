@@ -24,6 +24,22 @@ The complexity of the \AC\ is analysed along the following directions:
 
 \subsection{Cache Controller} 
 
+Each level of the cache memory hierarchy incorporates a finite state machine (FSM) called the \textit{cache controller} to track the state of the blocks currently being cached. The cache controller is the interface between the CPU, cache and DRAM as shown in Fig~\ref{fig:cache_controller_basics}(a). The figure depicts a look through hierarchy where the processor is isolated from the system, thus allowing the processor to run with data from the cache while another bus master is acessing main memory. Fig~\ref{fig:cache_controller_basics}(b) shows an overview of the implementation logic for the cache controller. Using the current state of the block and the incoming request ( which could be from the CPU, DRAM or a remote cache) a new state is set for the cache block. The state transition diagram of an L1 \AC\ is shown in Fig~\ref{fig:L1protocol}. The FSM for the \AC\ is a superset of an equivalent FSM for a conventional cache (without cache coherence; more details in \S~\ref{sec:coherence}).
+
+\begin{figure}[h]
+  \subfloat[Interface]{
+    \includegraphics[width=0.5\textwidth]{files/Figures/07-LookThroughArchitecture.pdf}
+  }
+  \subfloat[FSM Logic]{
+     \includegraphics[width=0.5\textwidth]{files/Figures/07-FSMLogic.pdf}
+  }
+  \caption[Cache Controller]{Fig (a) on the left shows a high level block diagram of the cache controller's (CC) position in the memory hierarchy. The \textit{Northbridge} is used to manage data communcations between the CPU and motherboard and is also where the memory controller resides. In newer architectures such as the Intel Sandy Bridge, the \textit{Northbridge} has been integrated on chip. Fig (b) on the right depicts a cache controller where the input data path from the cache (event) is used along with the current state to perform the corresponding action and change the state of the block as required.}
+  \label{fig:cache_controller_basics}
+\end{figure}
+
+
+The cache controller manages operations at the aligned RMAX granularity. The controller permits only one in-flight cache operation per RMAX region, i.e. transition buffer entries in the cache controller are indexed using the region bits. In-flight cache operations ensure no address overlap with stable \AB{}s in order to eliminate complex race conditions. Fig~\ref{fig:L1protocol} shows the L1 cache controller state machine for the \AC{}. 
+
 \begin{figure}[!h]
   \centering
   \includegraphics[width=\textwidth]{files/Figures/07-L1CC.pdf}
@@ -60,80 +76,23 @@ The complexity of the \AC\ is analysed along the following directions:
         \hline
     \end{tabular}
     }
-  \caption{\textbf{L1 Cache Controller for \AC\ } : The \AC\ specific states and events are marked by dashed lines. The \AC\ specific events are described in the table.}
+  \caption[L1 Cache Controller]{\textbf{L1 Cache Controller for \AC\ } : The \AC\ specific states and events are marked by dashed lines. The \AC\ specific events are described in the table.}
   \label{fig:L1protocol}
 \end{figure}
 
-We focus on the L1 controller here, and in particular, partial misses. The cache controller manages operations at
-the aligned RMAX granularity. The controller  permits only one in-flight cache operation per RMAX region. In-flight cache operations ensure no address overlap with stable  \AB{}s in order to eliminate complex race conditions. Figure~\ref{fig:L1protocol} shows the L1 cache controller state machine. We add two states to the default protocol, \code{IV\_B} and \code{IV\_C}, to handle partial misses. \code{IV\_B} is a blocking state that blocks other cache operations to RMAX region until all relevant \AB{}s to a partial miss are evicted (e.g., 0--3 and 5--7 blocks in Figure~\ref{fig:partial-miss}). \code{IV\_C} indicates partial miss completion. This enables the controller to treat the access as a full miss and issue the refill request. The other stable states (I, V, D) and transient states (\code{IV\_Data} and \code{ID\_Data}) are present in a conventional protocol as well. \code{Partial-miss} triggers the clean-up operations (\code{1} and \code{2} in Figure~\ref{fig:partial-miss}). \code{Local\_L1\_Evict} is a looping event that keeps retriggering for each \AB\ involved in the partial miss; \code{Last\_L1\_Evict} is triggered when the last \AB\ involved in the partial miss is evicted to the MSHR. A key difference between the L1 and lower-level protocols is that the Load/Store event in the lower-level protocol may need to access data from multiple \AB{}s. In such cases, similar to the partial-miss event, we read out each block independently before
-supplying the data (more details in \S~\ref{sec:multicache}).
+\clearpage
 
+A simple default single core protocol is assumed which contains blocks in either \code{Valid (V)}, \code{Not Present (NP)} and \code{Dirty (D)} as shown in Fig~\ref{fig:L1protocol}. There are also two transient states \code{IV Data}(block transitions from \code{Invalid/NP} to \code{Valid}, waiting for \code{Data} response from memory; cache miss caused by a load) and \code{ID Data}(block transitions from \code{Invalid/NP} to \code{Dirty}, waiting for \code{Data} response from memory; cache miss caused by a store). To handle partial misses, unique to the \AC{}, two new states are added to the default protocol, \code{IV\_B} and \code{IV\_C}. \code{IV\_B} is a blocking state that blocks other cache operations to RMAX region until all relevant \AB{}s to a partial miss are evicted. \code{IV\_C} indicates partial miss completion. This enables the controller to treat the access as a miss and issue the refill request. The \code{Partial Miss} event triggers the clean-up operations (Stage 1 and Stage 2 in Figure~\ref{fig:partial-miss}). \code{Local\_L1\_Evict} is an event that keeps being triggered for each \AB\ involved in the partial miss. \code{Last\_L1\_Evict} is triggered when the last \AB\ involved in the partial miss is evicted to the MSHR (see Stage 2 of Fig~\ref{fig:partial-miss}).
 
-% \subsection{Area, Latency, and Energy Overhead}
-% The extra metadata required by \AC\ are the T? (1 tag bit per word) and V? (1
-% valid bit per word) bitmaps. Table~\ref{table:overheads} shows the quantitative
-% overhead compared to the data storage. Both the T? and V?  bitmap
-% arrays are directly proportional to the size of the cache and require a
-% constant storage overhead (3\% in total). The T? bitmap is read in parallel
-% with the data array and does not affect the critical path; T? adds 2\%---3.5\%
-% (depending on cache size) to the overall cache access energy. 
-% V? is referred only on misses when inserting a new block.
+A key difference between the L1 and lower-level protocols is that the Load/Store event in the lower-level protocol may need to access data from multiple \AB{}s. In such cases, similar to the \code{Partial Miss} event, each block is read out independently before supplying the data (more details in \S~\ref{sec:multicache}).
 
-% \begin{table}[!htb]
-% {
-% \vspace{-10pt}
-% \centering
-% \caption{\AC\ Hardware Complexity.}
-% \label{table:overheads}
-% {
-% \small 
-% \begin{tabular}{|@{~}c@{~}|@{~}c@{~}|@{~}c@{~}|@{~}c@{~}|}
-% \hline
-% \multicolumn{4}{|c|}{Cache configuration}\\
-% \hline
-%              & 64K (256by/set) & 1MB (512by/set) & 4MB (1024by/set) \\
-% \hline
-% \multicolumn{4}{|l|}{Data RAM parameters} \\   
-% \hline
-% Delay        & 0.36ns & 2ns & 2.5 ns \\
-% Energy       & 100pJ & 230pJ  & 280pJ \\
-% \hline 
-% \multicolumn{4}{|c|}{\AC\ components (CACTI model)} \\   
-% \hline
-% T?/V? map & 1KB &  16KB & 64KB \\
-% Latency      & 0.019ns (5\%) & 0.12ns (6\%) & 0.2ns (6\%) \\   
-% Energy       & 2pJ (2\%) & 8pJ (3.4\%) & 10pJ (3.5\%)  \\ 
-% LRU  & $\frac{1}{8}$KB & 2KB & 8KB \\
-% \hline
-% \multicolumn{4}{|c|}{Lookup Overhead (VHDL model)} \\
-% \hline
-% Area    & 0.7\% & \multicolumn{2}{c|}{0.1\%} \\  
-% \hline
-% Latency & 0.02ns & 0.035ns & 0.04ns \\
-% \hline
-% \end{tabular}
-% }
+\subsection{Area, Latency, and Energy Overhead}
 
-% {
-%   \% indicates overhead compared to data array of cache. 64K cache operates in \textit{Fast mode}; 1MB and
-%   4MB operate in \textit{Normal mode}. We use 32nm ITRS HP transistors for
-%   64K and 32nm ITRS LOP transistors for 1MB and 4MB.
-% }
-% }
-% \end{table}
+The extra metadata required by \AC\ are the \code{T?}(1 tag bit per word) and \code{V?}(1 valid bit per word) bitmaps as shown in Fig~\ref{fig:amoeba_cache_arch}. Table~\ref{table:overheads} shows the quantitative overhead compared to the data storage.Both the \code{T?} and \code{V?} bitmap arrays are directly proportional to the size of the cache and require a constant storage overhead (3\% in total). The \code{T?} bitmap is read in parallel with the data array and does not affect the critical path; \code{T?} adds 2\%---3.5\% (depending on cache siz) to the overall cache access energy. \code{V?}is referred only on misses when inserting a new block.
 
-% We synthesized\footnote{We do not have access to an industry-grade 32nm library, 
-% so we synthesized at a higher 180nm node size and scaled the results to 32 nm 
-% (latency and energy scaled proportional to Vdd (taken from~\cite{cpudb}) 
-% and $Vdd^2$ respectively).}
-%  the cache lookup logic using Synopsys and quantify the area,
-% latency, and energy penalty. \AC\ is compatible with  \textit{Fast} and
-% \textit{Normal} cache access modes~\cite[-access-mode config]{muralimanohar-
-% micro-2007}, both of which read the entire set from the data array in parallel
-% with the way selection to  achieve lower latency.  \textit{Fast} mode
-% transfers the entire set to the edge of the H-tree, while  \textit{Normal}
-% mode, only transmits the selected way over the H-tree. For synthesis, we used
-% the Synopsys design compiler (Vision Z-2007.03-SP5).
+\input{files/Tables/hardware-overheads.tex}
+
+The \AC\ lookup logic was synthesized\footnote{Actual synthesis was at 180nm node size and the results were scaled to 32 nm (latency and energy scaled proportional to Vdd (taken from~\cite{cpudb}) and $Vdd^2$ respectively). For synthesis, we used the Synopsys design compiler (Vision Z-2007.03-SP5).} using Synopsys to quantify the area, latency, and energy penalty. \AC\ is compatible with  \textit{Fast} and \textit{Normal} cache access modes~\cite[-access-mode config]{muralimanohar-micro-2007}, both of which read the entire set from the data array in parallel with the way selection to  achieve lower latency. \textit{Fast} mode transfers the entire set to the edge of the H-tree, while  \textit{Normal} mode, only transmits the selected way over the H-tree. 
 
 
 
@@ -269,6 +228,59 @@ supplying the data (more details in \S~\ref{sec:multicache}).
 % With 8 tags/set (16KB
 % overhead), we can filter 64---95\% of the accesses in a 1MB cache and 55---
 % 75\% of the accesses in a 2MB cache.
+
+% \subsection{Multi-level Caches}
+% \label{sec:multicache}
+
+% We discuss the design of inclusive cache hierarchies including multiple
+% \AC{}s; we illustrate using a 2-level hierarchy. Inclusion means that the L2
+% cache contains a superset of the data words in the L1 cache; however, the two
+% levels may include different granularity blocks. For example, the Sun Niagara
+% T2 uses 16 byte L1 blocks and 64 byte L2 blocks. \AC\ permits non-aligned
+% blocks of variable granularity at the L1 and the L2, and needs to deal with
+% two issues: a) L2 recalls that may invalidate multiple L1 blocks and b) L1
+% refills that may need data from multiple blocks at the L2. For both cases, we
+% need to identify all the relevant \AB{}s that overlap with either the recall
+% or the refill request. This situation is similar to a Nigara's L2 eviction
+% which may need to recall 4 L1 blocks. \AC{}'s logic 
+% ensures that all \AB{}s from a region map to a single set at any
+% level (using the same RMAX for both L1 and L2). This ensures that L2 recalls
+% or L1 refills index into only a single set. To process multiple blocks
+% for a single cache operation, we use the step-by-step process outlined in
+% Section~\ref{sec:partialmiss} (\spot{1} and \spot{2} in 
+% Figure~\ref{fig:partial-miss}). Finally, the L1-L2 interconnect needs 3 virtual networks, two
+% of which, the L2$\rightarrow$L1 data virtual network and the L1$\rightarrow$L2
+% writeback virtual network, can have packets of variable granularity; each
+% packet is broken down into a variable number of smaller physical flits.
+
+
+% \subsection{Cache Coherence}
+% \label{sec:coherence}
+
+% There are three main challenges that variable cache line granularity
+% introduces when interacting with the coherence protocol: 1) How is the
+% coherence directory maintained? 2) How to support variable granularity
+% read sharing? and 3) What is the granularity of write invalidations?
+% The key insight that ensures compatibility with a conventional
+% fixed-granularity coherence protocol is that a \AB\ always lies
+% within an aligned RMAX byte region (see \S~\ref{sec:architecture}). To
+% ensure correctness, it is sufficient to maintain the coherence
+% granularity and directory information at a fixed granularity $\leq$
+% RMAX granularity. Multiple cores can simultaneously cache any variable
+% granularity \AB\ from the same region in \textit{S}hared state; all
+% such cores are marked as sharers in the directory entry. \REVIEW{ A
+%   core that desires exclusive ownership of an \AB\ in the region uses
+%   the directory entry to invalidate every \AB\ corresponding to the
+%   fixed coherence granularity. All \AB{}s relevant to an invalidation
+%   will be found in the same set in the private cache (see set indexing
+%   in \S~\ref{sec:architecture}). The coherence granularity could 
+%   potentially be $<$
+%   RMAX so that false sharing is not introduced in the quest
+%   for higher cache utilization (larger RMAX). The core claiming the
+%   ownership on a write will itself fetch only the desired granularity
+%   \AB{}, saving bandwidth. A detailed evaluation of the coherence
+%   protocol is beyond the scope of the current paper.}
+
 
 
 \section{Simulation Infrastructure}

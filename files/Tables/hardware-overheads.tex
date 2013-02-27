@@ -1,0 +1,39 @@
+%!TEX root=/home/ska124/Dropbox/Thesis/thes-full.tex
+
+\begin{table}[h]
+{
+  \centering
+  
+  
+  {
+  
+    \begin{tabular}{|@{~}c@{~}|@{~}c@{~}|@{~}c@{~}|@{~}c@{~}|}
+    \hline
+    \multicolumn{4}{|c|}{Cache configuration}\\
+    \hline
+                 & 64K (256by/set) & 1MB (512by/set) & 4MB (1024by/set) \\
+    \hline
+    \multicolumn{4}{|l|}{Data RAM parameters} \\   
+    \hline
+    Delay        & 0.36ns & 2ns & 2.5 ns \\
+    Energy       & 100pJ & 230pJ  & 280pJ \\
+    \hline 
+    \multicolumn{4}{|c|}{\AC\ components (CACTI model)} \\   
+    \hline
+    T?/V? map & 1KB &  16KB & 64KB \\
+    Latency      & 0.019ns (5\%) & 0.12ns (6\%) & 0.2ns (6\%) \\   
+    Energy       & 2pJ (2\%) & 8pJ (3.4\%) & 10pJ (3.5\%)  \\ 
+    LRU  & $\frac{1}{8}$KB & 2KB & 8KB \\
+    \hline
+    \multicolumn{4}{|c|}{Lookup Overhead (VHDL model)} \\
+    \hline
+    Area    & 0.7\% & \multicolumn{2}{c|}{0.1\%} \\  
+    \hline
+    Latency & 0.02ns & 0.035ns & 0.04ns \\
+    \hline
+  \end{tabular}
+  }
+  \caption[Hardware Overheads]{\textbf{\AC\ hardware overheads} :  Percentage indicates overhead compared to data array of a cache. 64K cache operates in \textit{Fast mode}; 1MB and 4MB operate in \textit{Normal mode}. International Technology Roadmap for Semiconductors (ITRS) specified 32nm High Performance (HP) transistors are assumed for 64K cache and 32nm ITRS Low Output Power (LOP) transistors for 1MB and 4MB.}
+  \label{table:overheads}
+}
+\end{table}

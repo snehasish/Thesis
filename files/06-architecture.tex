@@ -33,7 +33,6 @@ The key challenges to realising the \AC\ architecture are
 \end{enumerate}
 
 \begin{figure}[h]
-  %% Pg 84 - Jacob
   \begin{center}
     \includegraphics[width=\textwidth]{files/Figures/06-AmoebaCacheArch.pdf}
     \caption[Amoeba Cache Overview]{\textbf{Amoeba Cache Overview} The static RAM (SRAM) array where the tags and data are colocated is shown on the right. The \code{T? Bitmap} and the \code{V? Bitmap} for the \AC\ are shown on the left. Each block in the SRAM array represents 8 bytes (1 word). In this specific example, an \AC\ is shown with 4 sets and 1024 bytes per set. The invalid, data and tag words (marked in the SRAM array) are tracked by setting the corresponding bits in the \code{T? and V? Bitmaps}. This information is maintained in order to simplify cache operations such as insertion and refill. }
