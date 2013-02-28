@@ -50,6 +50,11 @@ Byn Choi, Rakesh Komuravelli, Hyojin Sung, Robert Smolinski, Nima Honarmand,
 Intel Corporation.
 \newblock Intel embedded pentium processor family dev. manual, 1998.
 
+\bibitem{Danowitz:2012:CDR:2133806.2133822}
+Andrew Danowitz, Kyle Kelley, James Mao, John~P. Stevenson, and Mark Horowitz.
+\newblock Cpu db: recording microprocessor history.
+\newblock {\em Commun. ACM}, 55(4):55--63, April 2012.
+
 \bibitem{Dubnicki:1992:ABS:139669.139725}
 Czarek Dubnicki and Thomas~J. LeBlanc.
 \newblock Adjustable block size coherent caches.
@@ -118,6 +123,14 @@ Diego~R. Llanos.
 \bibitem{manual:OpenSparcT1}
 Sun Microsystems.
 \newblock Opensparc t1 processor megacell specification, 2007.
+
+\bibitem{Muralimanohar:2007:ONO:1331699.1331704}
+Naveen Muralimanohar, Rajeev Balasubramonian, and Norm Jouppi.
+\newblock Optimizing nuca organizations and wiring alternatives for large
+  caches with cacti 6.0.
+\newblock In {\em Proceedings of the 40th Annual IEEE/ACM International
+  Symposium on Microarchitecture}, MICRO 40, pages 3--14, Washington, DC, USA,
+  2007. IEEE Computer Society.
 
 \bibitem{patent:DataCacheWayPrediction}
 Ajit~Karthik Mylavarapu.

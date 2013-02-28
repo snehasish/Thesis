@@ -6,7 +6,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Hardware Complexity and Simulation Infrastructure}
+\chapter{Implementation}
 \label{chap:hardware_complexity_and_simulation}
 
 This chapter describes the additional hardware complexity added to an \AC\ with respect to a conventional cache in order to support variable granularity \AB{}s. The chapter also describes the simulation infrastructure used to evaluate the performance of the \AC{}.
@@ -44,9 +44,8 @@ The cache controller manages operations at the aligned RMAX granularity. The con
   \centering
   \includegraphics[width=\textwidth]{files/Figures/07-L1CC.pdf}
   \\ 
-  \vspace{15pt}
+  \vspace{10pt}
   {
-  \small
   \begin{tabular}{|@{~}c@{~}|@{~}p{0.75\textwidth}|} 
         
         \multicolumn{2}{c}{ \textbf{L1 cache controller states}}\\
@@ -87,62 +86,20 @@ A simple default single core protocol is assumed which contains blocks in either
 A key difference between the L1 and lower-level protocols is that the Load/Store event in the lower-level protocol may need to access data from multiple \AB{}s. In such cases, similar to the \code{Partial Miss} event, each block is read out independently before supplying the data (more details in \S~\ref{sec:multicache}).
 
 \subsection{Area, Latency, and Energy Overhead}
+\label{sec:area_latency_energy_overhead}
 
 The extra metadata required by \AC\ are the \code{T?}(1 tag bit per word) and \code{V?}(1 valid bit per word) bitmaps as shown in Fig~\ref{fig:amoeba_cache_arch}. Table~\ref{table:overheads} shows the quantitative overhead compared to the data storage.Both the \code{T?} and \code{V?} bitmap arrays are directly proportional to the size of the cache and require a constant storage overhead (3\% in total). The \code{T?} bitmap is read in parallel with the data array and does not affect the critical path; \code{T?} adds 2\%---3.5\% (depending on cache siz) to the overall cache access energy. \code{V?}is referred only on misses when inserting a new block.
 
 \input{files/Tables/hardware-overheads.tex}
 
-The \AC\ lookup logic was synthesized\footnote{Actual synthesis was at 180nm node size and the results were scaled to 32 nm (latency and energy scaled proportional to Vdd (taken from~\cite{cpudb}) and $Vdd^2$ respectively). For synthesis, we used the Synopsys design compiler (Vision Z-2007.03-SP5).} using Synopsys to quantify the area, latency, and energy penalty. \AC\ is compatible with  \textit{Fast} and \textit{Normal} cache access modes~\cite[-access-mode config]{muralimanohar-micro-2007}, both of which read the entire set from the data array in parallel with the way selection to  achieve lower latency. \textit{Fast} mode transfers the entire set to the edge of the H-tree, while  \textit{Normal} mode, only transmits the selected way over the H-tree. 
+The \AC\ lookup logic was synthesized\footnote{Actual synthesis was at 180nm node size and the results were scaled to 32 nm (latency and energy scaled proportional to Vdd (taken from~\cite{Danowitz:2012:CDR:2133806.2133822}) and $Vdd^2$ respectively). For synthesis, we used the Synopsys design compiler (Vision Z-2007.03-SP5).} using Synopsys to quantify the area, latency and energy penalty. \AC\ is compatible with  \textit{Fast} and \textit{Normal} cache access modes~\cite{Muralimanohar:2007:ONO:1331699.1331704}, both of which read the entire set from the data array in parallel with the way selection to  achieve lower latency. \textit{Fast} mode transfers the entire set to the edge of the H-tree, while \textit{Normal} mode, only transmits the selected way over the H-tree. 
+
+Fig~\ref{fig:ac_lookup} shows \AC\'s lookup hardware overhead on the critical path. The \AC\ lookup logic is compared against a conventional cache's lookup logic (mainly the comparators). The area overhead of the \AC\ includes registering an entire line that has been read out, the tag operation logic, and the word selector. The components on the critical path once the data is read out are the 2-way multiplexers, the $\in$ comparators, and priority encoder that selects the word; the T?  bitmap is accessed in parallel and off the critical path. \AC\ is made feasible under today's wire-limited technology where the cache latency and energy is dominated by the bit/word lines, decoder, and H-tree~\cite{Muralimanohar:2007:ONO:1331699.1331704}. \AC{}'s comparators, which operate on the entire cache set, are 6$\times$ the area of a fixed cache's comparators. In a conventional cache, the data array occupies 99\% of the overall cache area. The critical path is dominated by the wide word selector since the comparators all operate in parallel. The lookup logic adds $\simeq$ 60\% to the conventional cache's comparator time. The overall critical path is dominated by the data array access and \AC{}'s lookup circuit adds 0.02ns to the access latency and $\simeq$ 1pJ to the energy of a 64K cache, and 0.035ns to the latency and $\simeq$2pJ to the energy of a 1MB cache. 
+
+\AC{}'s overhead needs careful consideration when implemented at the L1 cache level. There are two options for handling the latency overhead a) if the L1 cache is the critical stage in the pipeline, the CPU clock can be throttled by the latency overhead to ensure that the additional logic fits within the pipeline stage. This ensures that the number of pipeline stages for a memory access does not change with respect to a conventional cache, although all instructions bear the overhead of the reduced CPU clock; b) an extra pipeline stage can be added to the L1 hit path, adding a 1 cycle overhead to all memory accesses but ensuring no change in CPU frequency. We quantify the performance impact of both approaches in \S~\ref{sec:evaluation}.
 
 
-
-% Figure~\ref{fig:Lookup} shows \AC\'s lookup hardware on the critical path; 
-% we compare it
-% against a fixed-granularity cache's lookup logic (mainly the comparators). The
-% area overhead of the \AC\ includes registering an entire line that has been
-% read out, the tag operation logic, and the word selector. The components on the
-% critical path once the data is read out are the 2-way multiplexers, the $\in$
-% comparators, and priority encoder that selects the word; the T?  bitmap is
-% accessed in parallel and off the critical path. \AC\ is made feasible under
-% today's wire-limited technology where the cache latency and energy is
-% dominated by the bit/word lines, decoder, and H-tree~\cite{muralimanohar- micro-2007}.  \AC{}'s comparators, which operate on
-% the entire cache set, are 6$\times$ the area of a fixed cache's comparators. 
-% Note that the data array occupies 99\% of the overall cache area. The critical
-% path is dominated by the wide word selector since the comparators all
-% operate in parallel. The lookup logic adds 60\% to the conventional cache's
-% comparator time. The overall critical path is dominated by the data array
-% access and \AC{}'s lookup circuit adds 0.02ns to the access latency and
-% $\simeq$ 1pJ to the energy of a 64K cache, and 0.035ns to the latency and
-% $\simeq$2pJ to the energy of a 1MB cache. Finally, \AC\ amortizes the energy
-% penalty of the peripheral components (H-tree, Wordline, and decoder) over a
-% single RAM. 
-
-
-% \REVIEW{\AC{}'s overhead needs careful consideration when implemented at the L1
-% cache level. We have two options for handling the latency overhead a) if the L1
-% cache is the critical stage in the pipeline, we can throttle the CPU clock by
-% the latency overhead to ensure that the additional logic fits within the
-% pipeline stage. This ensures that the number of pipeline stages for a memory
-% access does not change with respect to a conventional cache, although all
-% instructions bear the overhead of the reduced CPU clock. b) we can add an
-% extra pipeline stage to the L1 hit path, adding a 1 cycle overhead to all
-% memory accesses but ensuring no change in CPU frequency. We quantify the
-% performance impact of both approaches in Section~\ref{sec:eval}.}
-
-
-% \subsection{Tag-only Operations}  Conventional caches support tag-only
-% operations to reduce data port contention. While the \AC\ merges tags and
-% data, like many commercial processors it decouples the replacement metadata
-% and valid bits from the tags, accessing the tags only on cache lookup. Lookups
-% can be either CPU side or network side (coherence invalidation and
-% Wback/Forwarding). CPU-side lookups and writebacks ($\simeq$ 95\% of cache
-% operations) both need data and hence \AC\ in the common case does not
-% introduce extra overhead. \AC\ does read out the entire data array unlike
-% serial-mode caches (we discuss this issue in the next section). Invalidation
-% checks and snoops can be more energy expensive with \AC{} compared to a
-% conventional cache. Fortunately, coherence snoops are not common in many
-% applications (e.g., 1/100 cache operations in SpecJBB) as a coherence
-% directory and an inclusive LLC filter them out.
+\subsection{Tag-only Operations}  Conventional caches support tag-only operations to reduce data port contention. While the \AC\ merges tags and data, like many commercial processors it decouples the replacement metadata and valid bits from the tags, accessing the tags only on cache lookup. Lookups can be either CPU side or network side (coherence invalidation and Wback/Forwarding). CPU-side lookups and writebacks ($\simeq$ 95\% of cache operations) both need data and hence \AC\ in the common case does not introduce extra overhead. \AC\ does read out the entire data array unlike serial-mode caches (we discuss this issue in the next section). Invalidation checks and snoops can be more energy expensive with \AC{} compared to a conventional cache. Fortunately, coherence snoops are not common in many applications (e.g., 1/100 cache operations in SpecJBB) as a coherence directory and an inclusive LLC filter them out.
 
 
 % \subsection{Tradeoff with Large Caches} \label{sec:extensions}
