@@ -96,149 +96,70 @@ The \AC\ lookup logic was synthesized\footnote{Actual synthesis was at 180nm nod
 
 Fig~\ref{fig:ac_lookup} shows \AC\'s lookup hardware overhead on the critical path. The \AC\ lookup logic is compared against a conventional cache's lookup logic (mainly the comparators). The area overhead of the \AC\ includes registering an entire line that has been read out, the tag operation logic, and the word selector. The components on the critical path once the data is read out are the 2-way multiplexers, the $\in$ comparators, and priority encoder that selects the word; the T?  bitmap is accessed in parallel and off the critical path. \AC\ is made feasible under today's wire-limited technology where the cache latency and energy is dominated by the bit/word lines, decoder, and H-tree~\cite{Muralimanohar:2007:ONO:1331699.1331704}. \AC{}'s comparators, which operate on the entire cache set, are 6$\times$ the area of a fixed cache's comparators. In a conventional cache, the data array occupies 99\% of the overall cache area. The critical path is dominated by the wide word selector since the comparators all operate in parallel. The lookup logic adds $\simeq$ 60\% to the conventional cache's comparator time. The overall critical path is dominated by the data array access and \AC{}'s lookup circuit adds 0.02ns to the access latency and $\simeq$ 1pJ to the energy of a 64K cache, and 0.035ns to the latency and $\simeq$2pJ to the energy of a 1MB cache. 
 
-\AC{}'s overhead needs careful consideration when implemented at the L1 cache level. There are two options for handling the latency overhead a) if the L1 cache is the critical stage in the pipeline, the CPU clock can be throttled by the latency overhead to ensure that the additional logic fits within the pipeline stage. This ensures that the number of pipeline stages for a memory access does not change with respect to a conventional cache, although all instructions bear the overhead of the reduced CPU clock; b) an extra pipeline stage can be added to the L1 hit path, adding a 1 cycle overhead to all memory accesses but ensuring no change in CPU frequency. We quantify the performance impact of both approaches in \S~\ref{sec:evaluation}.
+\AC{}'s overhead needs careful consideration when implemented at the L1 cache level. There are two options for handling the latency overhead a) if the L1 cache is the critical stage in the pipeline, the CPU clock can be throttled by the latency overhead to ensure that the additional logic fits within the pipeline stage. This ensures that the number of pipeline stages for a memory access does not change with respect to a conventional cache, although all instructions bear the overhead of the reduced CPU clock; b) an extra pipeline stage can be added to the L1 hit path, adding a 1 cycle overhead to all memory accesses but ensuring no change in CPU frequency. The performance impact of both approaches is quantified in \S~\ref{sec:evaluation}.
 
 
-\subsection{Tag-only Operations}  Conventional caches support tag-only operations to reduce data port contention. While the \AC\ merges tags and data, like many commercial processors it decouples the replacement metadata and valid bits from the tags, accessing the tags only on cache lookup. Lookups can be either CPU side or network side (coherence invalidation and Wback/Forwarding). CPU-side lookups and writebacks ($\simeq$ 95\% of cache operations) both need data and hence \AC\ in the common case does not introduce extra overhead. \AC\ does read out the entire data array unlike serial-mode caches (we discuss this issue in the next section). Invalidation checks and snoops can be more energy expensive with \AC{} compared to a conventional cache. Fortunately, coherence snoops are not common in many applications (e.g., 1/100 cache operations in SpecJBB) as a coherence directory and an inclusive LLC filter them out.
+\subsection{Tag-only Operations}  
+
+Conventional caches support tag-only operations to reduce data port contention. While the \AC\ merges tags and data, like many commercial processors it decouples the replacement metadata and valid bits from the tags, accessing the tags only on cache lookup. Lookups can be either CPU side or network side (coherence invalidation and Writeback/Forwarding). CPU-side lookups and writebacks ($\simeq$ 95\% of cache operations) both need data and hence \AC\ in the common case does not introduce extra overhead. \AC\ does read out the entire data array unlike serial-mode caches as discussed previously. Invalidation checks and snoops can be more energy expensive with \AC{} compared to a conventional cache. Fortunately, coherence snoops are not common in many applications (e.g., 1/100 cache operations in SpecJBB) as a coherence directory and an inclusive LLC filter them out.
 
 
-% \subsection{Tradeoff with Large Caches} \label{sec:extensions}
-% \begin{figure}[!ht] \centering
-% \begin{minipage}[c]{0.4\textwidth} {
-% \includegraphics[width=\textwidth]{plots/predictors/Serial_vs_Normal.pdf}
-% }
-% \end{minipage}
-% \begin{minipage}[c]{0.4\textwidth}
-% {
-% Baseline: Serial. $\leq1$ Normal is better.  32nm, ITRS  LOP.
-% } 
-% \end{minipage}  
-% \caption{Serial vs Normal mode cache.}
-% \label{fig:serial_parallel} 
-% \end{figure}
+\subsection{Tradeoff with large caches} 
+\label{sec:tradeoff_with_large_caches} % formerly extensions
 
-% Large caches with many words per set ($\equiv$ highly associative conventional
-% cache) need careful consideration.  \REVIEW{ Typically, highly associative
-% caches tend to serialize tag and data access with only the relevant cache
-% block read out on a hit and no data access on a miss. We first analyze the the
-% tradeoff between reading the entire set (normal mode), which is compatible with
-% \AC\, and only the relevant block (serial mode). } We vary the cache size from
-% 2M---8M and associativity from 4(256B/set) --- 32 (2048B/set).  Under current
-% technology constraints (Figure~\ref{fig:serial_parallel}), only at very high
-% associativity does serial mode demonstrate a notable energy benefit. Large
-% caches are dominated by H-tree energy consumption and reading out the entire
-% set at each sub-bank imposes an energy penalty when bitlines and wordlines
-% dominate (2KB+ \# of words/set).
+\begin{figure}[h] 
+\centering
+\includegraphics[width=0.7\textwidth]{files/Plots/07-Serial_vs_Normal.pdf}
 
-% \begin{table}[!h]
-% \begin{center}
-% \vspace{-10pt}
-% \caption{\% of direct accesses with fast tags}
-% \label{fig:tagcount}
-% {
-% \small
-% \begin{tabular}{|@{~}p{0.6in}@{~}|@{~}c@{~}|@{~}c@{~}|@{~}c@{~}|@{~}c@{~}|@{~}c@{~}|@{~}c@{~}|}
-% \hline
-% % \multicolumn{7}{|@{~}c@{~}|}{Cache Size}\\
-%   &  \multicolumn{2}{@{~}c@{~}|} {64K(256by/set)} &  \multicolumn{2}{@{~}c@{~}|} {1MB(512by/set)} & \multicolumn{2}{@{~}c@{~}|} {2MB(1024 by/set)} \\
-% \hline
-% \# Tags/set &2 &  4 & 4 & 8 & 8 & 16 \\
+Baseline: Serial. $\leq1$ Normal is better.  32nm, ITRS  LOP. 
+\caption[Serial vs. Normal - Latency and Energy]{\textbf{Serial vs Normal mode cache} : }
+\label{fig:serial_normal_graph} 
+\end{figure}
 
-% Overhead &  1KB & 2KB  & 2KB & 16KB  & 16KB & 32KB  \\  
-% \hline
-% {Benchmarks} & & & & & & \\
+Large caches with many words per set ($\equiv$ highly associative conventional cache) need careful consideration. Typically, highly associative caches tend to serialize tag and data access with only the relevant cache block read out on a hit and no data access on a miss. The tradeoff between reading the entire set (normal mode), which is compatible with \AC{}, and only the relevant block (serial mode), is analysed herein. The cache size is varied from 2M---8M and associativity from 4(256B/set) --- 32 (2048B/set).  Under current technology constraints (Figure~\ref{fig:serial_normal_graph}), only at very high associativity does serial mode demonstrate a notable energy benefit. Large caches are dominated by H-tree energy consumption and reading out the entire set at each sub-bank imposes an energy penalty when bitlines and wordlines dominate (2KB+ number of words per set).
 
-% Low      & 30\% & 45\% & 42\% & 64\% & 55\% & 74\%\\
-% Moderate & 24\% & 62\% & 46\% & 70\% & 63\% & 85\%\\
-% High     & 35\% & 79\% & 67\% & 95\% & 75\% & 96\%\\
-% \hline
-% \end{tabular}
-% }
-% \vspace{-10pt}
-% \end{center}
-% \end{table}
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+  &  \multicolumn{2}{c|} {64K (256 bytes/set)} 
+  &  \multicolumn{2}{c|} {1MB (512 bytes/set)} 
+  & \multicolumn{2}{c|} {2MB (1024 bytes/set)} \\
+\hline
+N Tags/set & 2 & 4 & 4 & 8 & 8 & 16 \\
+Overhead &  1KB & 2KB  & 2KB & 16KB  & 16KB & 32KB  \\  
+\hline
+\multicolumn{7}{|l|} {Benchmarks} \\
+\hline
+Low      & 30\% & 45\% & 42\% & 64\% & 55\% & 74\%\\
+Moderate & 24\% & 62\% & 46\% & 70\% & 63\% & 85\%\\
+High     & 35\% & 79\% & 67\% & 95\% & 75\% & 96\%\\
+\hline
+\end{tabular}
+\caption[Fast Tag accesses percent]{Percentage of direct accesses with fast tags}
+\label{fig:tagcount}
+
+\end{center}
+\end{table}
 
 
-% \REVIEW{\AC\ can be tuned to minimize the hardware overhead for large caches.
-% With many words/set the cache utilization improves due to longer block
-% lifetimes making it feasible to support \AB{}s with a larger minimum
-% granularity ($>$ 1 word). If we increase minimum granularity to two or four
-% words, only every third or fifth word could be a tag, meaning the \# of
-% comparators and multiplexers reduce to $\frac{N_{words/set}}{3}$ or
-% $\frac{N_{words/set}}{5}$. When the minimum granularity is equal to max
-% granularity (RMAX), we obtain a fixed granularity cache with
-% $N_{words/set}/RMAX$ ways. Cache organizations that collocate all the tags
-% together at the head of the data array enable tag-only operations and serial
-% \AB\ accesses that need to activate only a portion of the data array. However, the set may need to be compacted at each insertion. Recently, Loh and Hill~\cite{loh- hill-micro-2011} explored such an organization for
-% supporting tags in multi-gigabyte caches.}
+\AC\ can be tuned to minimize the hardware overhead for large caches. With many words/set the cache utilization improves due to longer block lifetimes making it feasible to support \AB{}s with a larger minimum granularity ($>$ 1 word). If we increase minimum granularity to two or four words, only every third or fifth word could be a tag, meaning the number of comparators and multiplexers reduce to $\frac{N_{words/set}}{3}$ or $\frac{N_{words/set}}{5}$. When the minimum granularity is equal to max granularity (RMAX), we obtain a fixed granularity cache with $N_{words/set}/RMAX$ ways. Cache organizations that collocate all the tags together at the head of the data array enable tag-only operations and serial \AB\ accesses that need to activate only a portion of the data array. However, the set may need to be compacted at each insertion. Recently, Loh and Hill~\cite{Loh:2012:SVL:2311639.2311823} explored such an organization for supporting tags in multi-gigabyte caches.
 
 
-% Finally, the use of \textit{Fast Tags} help reduce the tag lookups in the
-% data array. Fast tags use a separate traditional tag array-like structure to
-% cache the tags of the recently-used blocks and provide a pointer directly to
-% the \AB{}. The \# of \textit{Fast Tags} needed per set is proportional to the
-% \# of blocks in each set, which varies with the spatial locality in the
-% application and the \# of bytes per set (more details in
-% Section~\ref{sec:efficiency}). We studied 3 different cache configurations
-% (64K 256B/set, 1M 512B/set, and 2M 1024B/set) while varying the number of 
-% fast tags per set (see Table~\ref{fig:tagcount}). 
-% With 8 tags/set (16KB
-% overhead), we can filter 64---95\% of the accesses in a 1MB cache and 55---
-% 75\% of the accesses in a 2MB cache.
+The use of \textit{Fast Tags} help reduce the tag lookups in the data array. Fast tags use a separate traditional tag array-like structure to cache the tags of the recently-used blocks and provide a pointer directly to
+the \AB{} similar to \textit{Indirect Index Caches}(see \S~\ref{sec:indirect_index_caches}). The number of \textit{Fast Tags} needed per set is proportional to the number of blocks in each set, which varies with the spatial locality in the application and the number of bytes per set (more details in Section~\ref{sec:efficiency}). Three different cache configurations were studied (64K 256B/set, 1M 512B/set, and 2M 1024B/set) while varying the number of fast tags per set (see Table~\ref{fig:tagcount}). With 8 tags/set (16KB overhead), the fast tags can filter 64---95\% of the accesses in a 1MB cache and 55---75\% of the accesses in a 2MB cache.
 
-% \subsection{Multi-level Caches}
-% \label{sec:multicache}
+\subsection{Multi-level Caches}
+\label{sec:multicache}
 
-% We discuss the design of inclusive cache hierarchies including multiple
-% \AC{}s; we illustrate using a 2-level hierarchy. Inclusion means that the L2
-% cache contains a superset of the data words in the L1 cache; however, the two
-% levels may include different granularity blocks. For example, the Sun Niagara
-% T2 uses 16 byte L1 blocks and 64 byte L2 blocks. \AC\ permits non-aligned
-% blocks of variable granularity at the L1 and the L2, and needs to deal with
-% two issues: a) L2 recalls that may invalidate multiple L1 blocks and b) L1
-% refills that may need data from multiple blocks at the L2. For both cases, we
-% need to identify all the relevant \AB{}s that overlap with either the recall
-% or the refill request. This situation is similar to a Nigara's L2 eviction
-% which may need to recall 4 L1 blocks. \AC{}'s logic 
-% ensures that all \AB{}s from a region map to a single set at any
-% level (using the same RMAX for both L1 and L2). This ensures that L2 recalls
-% or L1 refills index into only a single set. To process multiple blocks
-% for a single cache operation, we use the step-by-step process outlined in
-% Section~\ref{sec:partialmiss} (\spot{1} and \spot{2} in 
-% Figure~\ref{fig:partial-miss}). Finally, the L1-L2 interconnect needs 3 virtual networks, two
-% of which, the L2$\rightarrow$L1 data virtual network and the L1$\rightarrow$L2
-% writeback virtual network, can have packets of variable granularity; each
-% packet is broken down into a variable number of smaller physical flits.
+We discuss the design of inclusive cache hierarchies including multiple \AC{}s; we illustrate using a 2-level hierarchy. Inclusion means that the L2 cache contains a superset of the data words in the L1 cache; however, the two levels may include different granularity blocks. For example, the Sun Niagara T2 uses 16 byte L1 blocks and 64 byte L2 blocks. \AC\ permits non-aligned blocks of variable granularity at the L1 and the L2, and needs to deal with two issues: a) L2 recalls that may invalidate multiple L1 blocks and b) L1 refills that may need data from multiple blocks at the L2. For both cases, we need to identify all the relevant \AB{}s that overlap with either the recall or the refill request. This situation is similar to a Nigara's L2 eviction which may need to recall 4 L1 blocks. \AC{}'s logic ensures that all \AB{}s from a region map to a single set at any level (using the same RMAX for both L1 and L2). This ensures that L2 recalls or L1 refills index into only a single set. To process multiple blocks for a single cache operation, we use the step-by-step process outlined in Section~\ref{sec:partialmiss} (\spot{1} and \spot{2} in Figure~\ref{fig:partial-miss}). Finally, the L1-L2 interconnect needs 3 virtual networks, two of which, the L2$\rightarrow$L1 data virtual network and the L1$\rightarrow$L2 writeback virtual network, can have packets of variable granularity; each packet is broken down into a variable number of smaller physical flits.
 
 
-% \subsection{Cache Coherence}
-% \label{sec:coherence}
+\subsection{Cache Coherence}
+\label{sec:coherence}
 
-% There are three main challenges that variable cache line granularity
-% introduces when interacting with the coherence protocol: 1) How is the
-% coherence directory maintained? 2) How to support variable granularity
-% read sharing? and 3) What is the granularity of write invalidations?
-% The key insight that ensures compatibility with a conventional
-% fixed-granularity coherence protocol is that a \AB\ always lies
-% within an aligned RMAX byte region (see \S~\ref{sec:architecture}). To
-% ensure correctness, it is sufficient to maintain the coherence
-% granularity and directory information at a fixed granularity $\leq$
-% RMAX granularity. Multiple cores can simultaneously cache any variable
-% granularity \AB\ from the same region in \textit{S}hared state; all
-% such cores are marked as sharers in the directory entry. \REVIEW{ A
-%   core that desires exclusive ownership of an \AB\ in the region uses
-%   the directory entry to invalidate every \AB\ corresponding to the
-%   fixed coherence granularity. All \AB{}s relevant to an invalidation
-%   will be found in the same set in the private cache (see set indexing
-%   in \S~\ref{sec:architecture}). The coherence granularity could 
-%   potentially be $<$
-%   RMAX so that false sharing is not introduced in the quest
-%   for higher cache utilization (larger RMAX). The core claiming the
-%   ownership on a write will itself fetch only the desired granularity
-%   \AB{}, saving bandwidth. A detailed evaluation of the coherence
-%   protocol is beyond the scope of the current paper.}
-
-
+There are three main challenges that variable cache line granularity introduces when interacting with the coherence protocol: 1) How is the coherence directory maintained? 2) How to support variable granularity read sharing? and 3) that is the granularity of write invalidations? The key insight that ensures compatibility with a conventional
+fixed-granularity coherence protocol is that a \AB\ always lies within an aligned RMAX byte region (see \S~\ref{sec:architecture}). To ensure correctness, it is sufficient to maintain the coherence granularity and directory information at a fixed granularity $\leq$ RMAX granularity. Multiple cores can simultaneously cache any variable granularity \AB\ from the same region in \textit{S}hared state; all such cores are marked as sharers in the directory entry. A core that desires exclusive ownership of an \AB\ in the region uses the directory entry to invalidate every \AB\ corresponding to the fixed coherence granularity. All \AB{}s relevant to an invalidation   will be found in the same set in the private cache (see set indexing in \S~\ref{sec:architecture}). The coherence granularity could potentially be $<$ RMAX so that false sharing is not introduced in the quest  for higher cache utilization (larger RMAX). The core claiming the ownership on a write will itself fetch only the desired granularity \AB{}, saving bandwidth. A detailed evaluation of the coherence protocol is beyond the scope of the current paper.
 
 \section{Simulation Infrastructure}
 

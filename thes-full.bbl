@@ -120,6 +120,12 @@ Diego~R. Llanos.
   measurement of computer systems.
 \newblock {\em SIGMOD Rec.}, 35(4):6--15, December 2006.
 
+\bibitem{Loh:2012:SVL:2311639.2311823}
+Gabriel Loh and Mark~D. Hill.
+\newblock Supporting very large dram caches with compound-access scheduling and
+  missmap.
+\newblock {\em IEEE Micro}, 32(3):70--78, May 2012.
+
 \bibitem{manual:OpenSparcT1}
 Sun Microsystems.
 \newblock Opensparc t1 processor megacell specification, 2007.
