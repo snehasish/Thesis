@@ -126,6 +126,22 @@ Gabriel Loh and Mark~D. Hill.
   missmap.
 \newblock {\em IEEE Micro}, 32(3):70--78, May 2012.
 
+\bibitem{Luk:2005:PBC:1065010.1065034}
+Chi-Keung Luk, Robert Cohn, Robert Muth, Harish Patil, Artur Klauser, Geoff
+  Lowney, Steven Wallace, Vijay~Janapa Reddi, and Kim Hazelwood.
+\newblock Pin: building customized program analysis tools with dynamic
+  instrumentation.
+\newblock In {\em Proceedings of the 2005 ACM SIGPLAN conference on Programming
+  language design and implementation}, PLDI '05, pages 190--200, New York, NY,
+  USA, 2005. ACM.
+
+\bibitem{Martin:2005:MGE:1105734.1105747}
+Milo M.~K. Martin, Daniel~J. Sorin, Bradford~M. Beckmann, Michael~R. Marty, Min
+  Xu, Alaa~R. Alameldeen, Kevin~E. Moore, Mark~D. Hill, and David~A. Wood.
+\newblock Multifacet's general execution-driven multiprocessor simulator (gems)
+  toolset.
+\newblock {\em SIGARCH Comput. Archit. News}, 33(4):92--99, November 2005.
+
 \bibitem{manual:OpenSparcT1}
 Sun Microsystems.
 \newblock Opensparc t1 processor megacell specification, 2007.
