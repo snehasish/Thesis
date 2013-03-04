@@ -9,16 +9,17 @@
 \chapter{Evaluation}
 \label{chap:evaluation}
 
-\section{Best Effort - Oracle}
-\subsection{Miss Rate - Performance}
-\subsection{Bandwidth - Energy}
-
-\section{Comparative Study}
-
-\section{Predictor Tradeoffs}
-\label{sec:predictor_tradeoffs}
-
-\section{Multi Core Shared Cache}
-
-
+\section{Improved Memory Hierarchy Efficiency}
+\label{sec:efficiency}
+\vspace{5pt}
+\noindent \textbf{Result 1:}{\emph~{\AC\ increases cache capacity by harvesting
+  space from unused words and can achieve an 18\% reduction in both L1 and
+  L2 miss rate.}
+\\ \\
+\noindent \textbf{Result 2:}{\emph~{\AC\ adaptively sizes the cache block
+  granularity and reduces L1$\leftrightarrow$L2 bandwidth by 46\% and
+  L2$\leftrightarrow$Memory bandwidth by 38\%.}
+}
+\\ \\
+In this section, the bandwidth and miss rate properties of an \AC\ are compared against a conventional cache. A \textit{Fixed} cache represents a conventional cache which allocates a fixed granularity cache block on a refill request. The accuracy of the spatial pattern predictor is an important factor which governs the accuracy of the \AC\ and is evaluated separately. For the results presented in this section, cache line utilisation statistics, gathered from a prior run of the application on a conventional cache, are used to drive the predictor. This isolates the benefits of the \AC\ from the potentially changing accuracy of the spatial pattern predictor across different cache geometries. This also ensures that the spatial granularity predictions can be replayed across multiple simulation runs. To ensure equivalent data storage space, the \AC\ size is set to the sum of the tag array and the data array in a conventional cache. At the L1 level (64K), the net capacity of the \AC\ is 64K + 8*4*256 bytes and at the L2 level (1M) configuration, it is 1M + 8*8*2048 bytes. The L1 cache has 256 sets and the L2 cache has 2048 sets. 
 
