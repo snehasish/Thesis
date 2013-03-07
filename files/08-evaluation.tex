@@ -29,8 +29,10 @@ This chapter evaluates the performance of the \AC\ described in Chapter~\ref{cha
 }
 \\ \\
 In this section, the bandwidth and miss rate properties of an \AC\ are compared against a conventional cache. A \textit{Fixed} cache represents a conventional cache which allocates a fixed granularity cache block on a refill request. The accuracy of the spatial pattern predictor is an important factor which governs the accuracy of the \AC\ and is evaluated separately. For the results presented in this section, cache line utilisation statistics, gathered from a prior run of the application on a conventional cache, are used to drive the predictor. This isolates the benefits of the \AC\ from the potentially changing accuracy of the spatial pattern predictor across different cache geometries. This also ensures that the spatial granularity predictions can be replayed across multiple simulation runs. To ensure equivalent data storage space, the \AC\ size is set to the sum of the tag array and the data array in a conventional cache. At the L1 level (64K), the net capacity of the \AC\ is 64K + 8*4*256 bytes and at the L2 level (1M) configuration, it is 1M + 8*8*2048 bytes. The L1 cache has 256 sets and the L2 cache has 2048 sets. 
-\\ \\
-\indent Fig~\ref{fig:eval_scatter_bw_64k_1m} plots the miss rate and the traffic characteristics of the \AC{}.  Since \AC{} can hold blocks varying from 8B to 64B, each set can hold more blocks by utilizing the space from untouched words. \AC\ reduces the 64K L1 miss rate by 23\%(stdev:24) for the Low group, and by 21\%(stdev:16) for the moderate group; even applications with high spatial locality experience a 7\%(stdev:8) improvement in miss rate. There is a 46\%(stdev:20) reduction on average in L1$\leftrightarrow$L2 bandwidth. At the 1M L2 level, \AC\ improves the moderate group's miss rate by 8\%(stdev:10) and bandwidth by 23\%(stdev:12).  Applications with moderate utilization make better use of the space harvested from unused words by \AC{}. Many low utilization applications tend to be streaming and providing extra cache space does not help lower miss rate. However, by not fetching unused words, the \AC\ achieves a significant reduction (38\%(stdev:24) on average) in off-chip L2$\leftrightarrow$Memory bandwidth; even High utilization applications see a 17\%(stdev:15) reduction in bandwidth.  Utilization and miss rate are not, however, always directly correlated (more details in \S~\ref{sec:adaptivity}).
+
+Fig~\ref{fig:eval_scatter_bw_64k_1m} plots the miss rate and the traffic characteristics of the \AC{}.  Since \AC{} can hold blocks varying in size from 8B to 64B, each set can hold more blocks by utilizing the space saved from eliminating untouched words. The \AC\ reduces the 64K L1 miss rate on average by 23\%\footnote{All reported averages are geometric mean unless otherwise specified.} and standard deviation(SD) of 24 for the Low group, and by 21\%(SD:16) for the moderate group; even applications with high spatial locality experience a 7\%(SD:8) improvement in miss rate. There is a 46\%(SD:20) reduction on average in L1$\leftrightarrow$L2 bandwidth. At the 1M L2 level, the \AC\ improves the moderate group's miss rate by 8\%(SD:10) and bandwidth by 23\%(SD:12).  Applications with moderate utilization make better use of the space harvested from unused words by \AC{}. Many low utilization applications tend to be streaming and providing extra cache space does not help lower miss rate. However, by not fetching unused words, the \AC\ achieves a significant reduction (38\%(SD:24) on average) in off-chip L2$\leftrightarrow$Memory bandwidth; even High utilization applications see a 17\%(SD:15) reduction in bandwidth.  Utilization and miss rate are not, however, always directly correlated (more details in \S~\ref{sec:adaptivity}).
+
+With the \AC\, the number of blocks per set varies based on the granularity of the blocks being fetched, which in turn depends on the spatial locality in the application. Table~\ref{table:blockcount} shows the average number of blocks per set. In applications with low spatial locality, the \AC\ adjusts the block size and adapts to store many smaller blocks. The 64K L1 \AC\ stores 10 blocks per set for mcf and 12 blocks per set for art, effectively increasing associativity without introducing hardware overheads. At the L2, when the working set starts to fit in the L2 cache, the set is partitioned into fewer blocks. 
 
 \begin{figure}[ht]
 
@@ -60,3 +62,42 @@ In this section, the bandwidth and miss rate properties of an \AC\ are compared 
 \end{figure}
 
 \clearpage
+
+\input{files/Tables/AB_Per_Set}
+
+\begin{figure}[!h]
+  \centering
+  \subfloat[64K L1 cache]{
+    \includegraphics[width=0.8\textwidth]{files/Plots/08-StackBar_PredictSize_64K.pdf}
+  }
+
+  \subfloat[1M L2 cache]{
+    \includegraphics[width=0.8\textwidth]{files/Plots/08-StackBar_PredictSize_1M.pdf}
+  }
+  \caption[Distribution of cache block sizes]{Distribution of cache line granularities in the (a) 64K L1 and (b) 1M L2 \AC{}. Average utilization is on top.}
+  \label{fig:StackBar_PredictorSize_64K}
+\end{figure}
+
+Note that applications like eclipse and omnetpp hold only 3---5 blocks per set on average (lower than conventional associativity) due to their low miss rates (see Table~\ref{table:Abs_Eval_Oracle}). With streaming applications (e.g., canneal), \AC\ increases the number of blocks/set to $>$15 on average. Finally, some applications like apache store between 6---7 blocks/set with a 64K cache with varied block sizes (see Figure~\ref{fig:StackBar_PredictorSize_64K}): approximately 50\% of the blocks store 1-2 words and 30\% of the blocks store 8 words at the L1. As the size of the cache increases and thereby the lifetime of the blocks, the \AC\ adapts to store larger size blocks as can be seen in Figure~\ref{fig:StackBar_PredictorSize_64K}.
+
+Utilization is improved greatly across all applications (90\%+ in many cases). Figure~\ref{fig:StackBar_PredictorSize_64K} shows the distribution of cache block granularities in \AC{}. The \AB\ distribution matches the word access distribution presented in Fig~\ref{fig:stackbar_words_64k}). With the 1M cache, the larger cache size improves block lifespan and thereby utilization, with a significant drop in the \% of 1---2 word blocks. However, in many applications (tpc-c, apache, firefox, twolf, lbm, mcf), up to 20\% of the blocks are 3--6 words wide, indicating the benefits of adaptivity and the challenges faced by a fixed granularity conventional cache.
+
+\input{files/Tables/Abs_Eval_Oracle}
+
+\section{Overall Performance and Energy}
+
+\noindent \textbf{Result 3:}{~\AC\ improves overall cache efficiency and boosts performance by 10\% on commercial applications\footnote{``Commercial'' applications includes Apache, SpecJBB and TPC-C.}, saving up to 11\% of the energy of the on-chip memory hierarchy. Off-chip L2$\leftrightarrow$memory energy sees a mean reduction of 41\% across all workloads (86\% for art and 93\% for twolf). 
+\\ \\
+A two-level cache hierarchy is modeled in which the L1 is a 64K cache with 256 sets (3 cycles load-to-use) and the L2 is 1M, 8192 sets (20 cycles). A fixed memory latency of 300 cycles is assumed. It is assumed that the L1 access is the critical pipeline stage and throttle CPU clock by 4\% (an alternative approach is evaluated in the next section).  The total dynamic energy of the \AC\ is calculated using the energy numbers determined in Section~\ref{sec:area_latency_energy_overhead} through a combination of synthesis and CACTI~\cite{Muralimanohar:2007:ONO:1331699.1331704}. 4 fast tags per set at the L1 and 8 fast tags per set at the L2 are used. The penalty for all the extra metadata in the \AC{} is included. The energy for a single L1---L2 transfer (6.8pJ per byte) is derived from~\cite{weti,Muralimanohar:2007:ONO:1331699.1331704}. The interconnect uses full-swing wires at 32nm, 0.6V. 
+
+\begin{figure}[h]
+  \centering
+    \includegraphics[width=0.7\textwidth]{files/Plots/08-DualY_Perf_Energy_A.pdf}
+    \includegraphics[width=0.7\textwidth]{files/Plots/08-DualY_Perf_Energy_B.pdf}
+    \caption{Make this one chart \% improvement in performance and \% reduction in on-chip memory hierarchy energy. \\ Higher is better. Y-axis terminated to illustrate bars clearly.  Baseline: Fixed, 64K L1, 1M L2.}
+    \label{plot:multi_sys_perf_energy}
+\end{figure}
+
+
+\section{\AC\ Adaptivity}
+\label{sec:adaptivity}

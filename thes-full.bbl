@@ -5,6 +5,11 @@ A.~R. Alameldeen.
 \newblock {\em Using Compression to Improve Chip Multiprocessor Performance}.
 \newblock PhD thesis, University of Wisconsin, Madison, 2006.
 
+\bibitem{weti}
+D.~Albonesi, A.~Kodi, and Stojanovic V.
+\newblock {NSF} {W}orkshop on {E}merging {T}echnologies for {I}nterconnects
+  ({WETI}), 2012.
+
 \bibitem{Bienia:2008:PBS:1454115.1454128}
 Christian Bienia, Sanjeev Kumar, Jaswinder~Pal Singh, and Kai Li.
 \newblock The parsec benchmark suite: characterization and architectural
