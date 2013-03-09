@@ -65,11 +65,9 @@ With the \AC\, the number of blocks per set varies based on the granularity of t
 
 \input{files/Tables/AB_Per_Set}
 
-
-
-Note that applications like eclipse and omnetpp hold only 3---5 blocks per set on average (lower than conventional associativity) due to their low miss rates (see Table~\ref{table:Abs_Eval_Oracle}). With streaming applications (e.g., canneal), \AC\ increases the number of blocks/set to $>$15 on average. Finally, some applications like apache store between 6---7 blocks/set with a 64K cache with varied block sizes (see Figure~\ref{fig:StackBar_PredictorSize}): approximately 50\% of the blocks store 1-2 words and 30\% of the blocks store 8 words at the L1. As the size of the cache increases and thereby the lifetime of the blocks, the \AC\ adapts to store larger size blocks as can be seen in Figure~\ref{fig:StackBar_PredictorSize_64K}.
-
-Utilization is improved greatly across all applications (90\%+ in many cases). Figure~\ref{fig:StackBar_PredictorSize_64K} shows the distribution of cache block granularities in \AC{}. The \AB\ distribution matches the word access distribution presented in Fig~\ref{fig:stackbar_words_64k}). With the 1M cache, the larger cache size improves block lifespan and thereby utilization, with a significant drop in the \% of 1---2 word blocks. However, in many applications (tpc-c, apache, firefox, twolf, lbm, mcf), up to 20\% of the blocks are 3--6 words wide, indicating the benefits of adaptivity and the challenges faced by a fixed granularity conventional cache.
+Note that applications like eclipse and omnetpp hold only 3---5 blocks per set on average (lower than conventional associativity) due to their low miss rates (see Table~\ref{table:Abs_Eval_Oracle}). With streaming applications (e.g., canneal), \AC\ increases the number of blocks/set to $>$15 on average. Finally, some applications like apache store between 6---7 blocks/set with a 64K cache with varied block sizes (see Figure~\ref{fig:StackBar_PredictorSize}): approximately 50\% of the blocks store 1-2 words and 30\% of the blocks store 8 words at the L1. As the size of the cache increases and thereby the lifetime of the blocks, the \AC\ adapts to store larger size blocks as can be seen in Figure~\ref{fig:StackBar_PredictorSize}.
+\\ \\
+\indent Utilization is improved greatly across all applications (90\%+ in many cases). Figure~\ref{fig:StackBar_PredictorSize} shows the distribution of cache block granularities in \AC{}. The \AB\ distribution matches the word access distribution presented in Fig~\ref{fig:stackbar_words_64k}). With the 1M cache, the larger cache size improves block lifespan and thereby utilization, with a significant drop in the \% of 1---2 word blocks. However, in many applications (tpc-c, apache, firefox, twolf, lbm, mcf), up to 20\% of the blocks are 3--6 words wide, indicating the benefits of adaptivity and the challenges faced by a fixed granularity conventional cache.
 
 \begin{figure}[!h]
   \centering
@@ -95,22 +93,15 @@ Utilization is improved greatly across all applications (90\%+ in many cases). F
   \subfloat[1M L2 cache]{
     \includegraphics[width=\textwidth]{files/Plots/08-Oracle-1M-Miss-BW-Improvement.pdf}
   }
-  \caption[Miss Rate and Bandwidth Improvement]{Miss Rate and bandwidth reduction with respect to a fixed granularity conventional cache with cache line size 64 bytes for (a) 64K equivalent \AC\ and (b) 1M equivalent \AC{}}
+  \caption[Miss Rate and Bandwidth Improvement]{Miss Rate and bandwidth reduction with respect to a fixed granularity conventional cache with cache line size 64 bytes for (a) 64K equivalent \AC\ and (b) 1M equivalent \AC{}.}
   \label{fig:miss_bw_reduction}
 \end{figure}
 
 \section{Overall Performance and Energy}
 \label{sec:overall_performance_and_energy}
-\noindent \textbf{Result 3:}{~\AC\ improves overall cache efficiency and boosts performance by 10\% on commercial applications\footnote{``Commercial'' applications includes Apache, SpecJBB and TPC-C.}, saving up to 11\% of the energy of the on-chip memory hierarchy. Off-chip L2$\leftrightarrow$memory energy sees a mean reduction of 41\% across all workloads (86\% for art and 93\% for twolf). 
-\\ \\
-A two-level cache hierarchy is modeled in which the L1 is a 64K cache with 256 sets (3 cycles load-to-use) and the L2 is 1M, 8192 sets (20 cycles). A fixed memory latency of 300 cycles is assumed. It is assumed that the L1 access is the critical pipeline stage and throttle CPU clock by 4\% (an alternative approach is evaluated in the next section).  The total dynamic energy of the \AC\ is calculated using the energy numbers determined in Section~\ref{sec:area_latency_energy_overhead} through a combination of synthesis and CACTI~\cite{Muralimanohar:2007:ONO:1331699.1331704}. 4 fast tags per set at the L1 and 8 fast tags per set at the L2 are used. The penalty for all the extra metadata in the \AC{} is included. The energy for a single L1---L2 transfer (6.8pJ per byte) is derived from~\cite{weti,Muralimanohar:2007:ONO:1331699.1331704}. The interconnect uses full-swing wires at 32nm, 0.6V. 
+\noindent \textbf{Result 3:}{~\AC\ improves overall cache efficiency and boosts performance by 10\% on commercial applications\footnote{``Commercial'' applications includes Apache, SpecJBB and TPC-C.}, saving up to 11\% of the energy of the on-chip memory hierarchy. Off-chip L2$\leftrightarrow$memory energy sees a mean reduction of 41\% across all workloads. 
 
-Figure~\ref{plot:multi_sys_perf_energy} plots the overall improvement in performance and reduction in on-chip memory hierarchy energy (L1 and L2 caches, and L1$\leftrightarrow$L2 interconnect). For applications that have good spatial locality (e.g., tradesoap, milc, facesim, eclipse, and cactus), the \AC\ has minimal impact on miss rate, but provides significant benefit in terms of reduction in bandwidth. This results in on-chip energy reduction: milc's L1$\leftrightarrow$L2 bandwidth reduces by $\simeq$15\%(see Figure~\ref{fig:miss_bw_reduction}(a)) and its on-chip energy reduces by 5\%. Applications that suffer from cache pollution under \textit{Fixed} (apache, jbb, twolf, soplex and art) see gains in performance and energy. Apache's performance improves by 11\% and on-chip energy reduces by 21\%, while SpecJBB's performance improves by 21\% and energy reduces by 9\%. Art gains approximately 50\% in performance.  Streaming applications like mcf access blocks with both low and high utilization. Keeping out the unused words in the under-utilized blocks prevents the well-utilized cache blocks from being evicted; mcf's performance improves by 12\% and on-chip energy by 36\%.
-
-\subsection{Extra cache pipeline stage}
-An alternative strategy to accommodate \AC{}'s overheads is to add an extra pipeline stage to the cache access which increases hit latency by 1 cycle. The CPU clock frequency entails no extra penalty compared to a conventional cache. Using such a design, applications in the moderate and low spatial locality group (8 applications), the \AC\ continues to provide a performance benefit between 6---50\%. milc and canneal suffer minimal impact, with a 0.4\% improvement and 3\% slowdown respectively.  Applications in the high spatial locality group (12 applications) suffer an average 15\% slowdown (maximum
-
-\begin{figure}[h]
+\begin{figure}[!h]
   \centering
     \subfloat[Energy Improvement]{
       \includegraphics[width=\textwidth]{files/Plots/08-Oracle_Energy.pdf}
@@ -125,25 +116,58 @@ An alternative strategy to accommodate \AC{}'s overheads is to add an extra pipe
 
 \clearpage
 
-22\%) due to the increase in L1 access latency. In these applications, 43\% of the instructions (on average) are memory accesses and a 33\% increase in L1 hit latency imposes a high penalty. Note that all applications continue to retain the energy benefit. The cache hierarchy energy is dominated by the interconnects and the \AC\ provides notable bandwidth reduction. While these results may change for an out-of-order, multiple-issue processor, the evaluation suggests that \AC\ if implemented with the extra pipeline stage is more suited for lower levels in the memory hierarchy than the L1.  
+A two-level cache hierarchy is modeled in which the L1 is a 64K cache with 256 sets (3 cycles load-to-use) and the L2 is 1M, 8192 sets (20 cycles). A fixed memory latency of 300 cycles is assumed. It is assumed that the L1 access is the critical pipeline stage and throttle CPU clock by 4\% (an alternative approach is evaluated in the next section).  The total dynamic energy of the \AC\ is calculated using the energy numbers determined in Section~\ref{sec:area_latency_energy_overhead} through a combination of synthesis and CACTI~\cite{Muralimanohar:2007:ONO:1331699.1331704}. 4 fast tags per set at the L1 and 8 fast tags per set at the L2 are used. The penalty for all the extra metadata in the \AC{} is included. The energy for a single L1---L2 transfer (6.8pJ per byte) is derived from~\cite{weti,Muralimanohar:2007:ONO:1331699.1331704}. The interconnect uses full-swing wires at 32nm, 0.6V. 
+
+Figure~\ref{plot:multi_sys_perf_energy} plots the overall improvement in performance and reduction in on-chip memory hierarchy energy (L1 and L2 caches, and L1$\leftrightarrow$L2 interconnect). For applications that have good spatial locality (e.g., tradesoap, milc, facesim, eclipse, and cactus), the \AC\ has minimal impact on miss rate, but provides significant benefit in terms of reduction in bandwidth. This results in on-chip energy reduction: milc's L1$\leftrightarrow$L2 bandwidth reduces by $\simeq$15\%(see Figure~\ref{fig:miss_bw_reduction}(a)) and its on-chip energy reduces by 5\%. Applications that suffer from cache pollution under \textit{Fixed} (apache, jbb, twolf, soplex and art) see gains in performance and energy. Apache's performance improves by 11\% and on-chip energy reduces by 21\%, while SpecJBB's performance improves by 21\% and energy reduces by 9\%. Art gains approximately 50\% in performance.  Streaming applications like mcf access blocks with both low and high utilization. Keeping out the unused words in the under-utilized blocks prevents the well-utilized cache blocks from being evicted; mcf's performance improves by 12\% and on-chip energy by 36\%.
+
+\subsection{Extra cache pipeline stage}
+\label{sec:extra_cache_pipeline_stage}
+
+An alternative strategy to accommodate \AC{}'s overheads is to add an extra pipeline stage to the cache access which increases hit latency by 1 cycle. The CPU clock frequency entails no extra penalty compared to a conventional cache. Using such a design, applications in the moderate and low spatial locality group (8 applications), the \AC\ continues to provide a performance benefit between 6---50\%. milc and canneal suffer minimal impact, with a 0.4\% improvement and 3\% slowdown respectively.  Applications in the high spatial locality group (12 applications) suffer an average 15\% slowdown (maximum 22\%) due to the increase in L1 access latency. In these applications, 43\% of the instructions (on average) are memory accesses and a 33\% increase in L1 hit latency imposes a high penalty. Note that all applications continue to retain the energy benefit. The cache hierarchy energy is dominated by the interconnects and the \AC\ provides notable bandwidth reduction. While these results may change for an out-of-order, multiple-issue processor, the evaluation suggests that \AC\ if implemented with the extra pipeline stage is more suited for lower levels in the memory hierarchy than the L1.  
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{files/Figures/Placeholder_Chart_Wide.pdf}
+  \caption{Placeholder for extra pipeline stage performance plot -- all apps}
+  \label{fig:extra_cache_pipeline_stage}
+\end{figure}
 
 \subsection{Off-chip L2$\leftrightarrow$Memory energy}
 The L2's higher cache capacity makes it less susceptible to pollution and provides less opportunity for improving miss rate. In such cases, the \AC\ keeps out unused words and reduces off-chip bandwidth and thereby off-chip energy. We assume that the off-chip DRAM can provide adaptive granularity transfers for \AC{}'s L2 refills as in~\cite{Yoon_Jeong_Erez_2011}. The DRAM model used was presented in a recent study~\cite{exascale} and consumes 0.5nJ per word transferred off-chip. The low spatial locality applications see a dramatic reduction in off-chip energy. For example, twolf sees a 93\% reduction. On commercial workloads the off-chip energy decreases by 31\% and 24\% respectively. Even for applications with high cache utilization, off-chip energy decreases by 15\%.
 
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{files/Figures/Placeholder_Chart_Wide.pdf}
+  \caption{Placeholder for off chip energy plot -- all apps}
+  \label{fig:offchip_energy}
+\end{figure}
+
+
 \section{Spatial Predictor Tradeoffs}
 \label{sec:spatial_predictor_tradeoffs}
 
-We evaluate the effectiveness of spatial pattern prediction in this section. In our table-based approach, a pattern history table records spatial patterns from evicted blocks and is accessed using a prediction index. The table-driven approach requires careful consideration of the following: prediction index, predictor table size, and training period. We quantify the effects by comparing the predictor against a baseline fixed-granularity cache. We use a 64K cache since it induces enough misses and evictions to highlight the predictor tradeoffs clearly.
+The effectiveness of spatial pattern prediction is evaluated in this section. In the table-based approach, a pattern history table records spatial patterns from evicted blocks and is accessed using a prediction index. The table-driven approach requires careful consideration of the following: prediction index, predictor table size and training period. The effects are quantified by comparing the predictor against a baseline fixed-granularity cache. A baseline 64K cache is used since it induces enough misses and evictions to highlight the predictor tradeoffs clearly.
 
 \subsection{Predictor Indexing} 
 
-A critical choice with the history-based prediction is the selection of the predictor index. We explored two types of predictor indexing a) a PC-based approach~\cite{chen-hpca-2004} based on the intuition that fields in a data structure are accessed by specific PCs and tend to exhibit similar spatial behavior. The tag includes the the PC and the critical word index: (($PC>>3)<<3 $)+$\frac{(addr\%64)}{8}$. and b) a Region-based (\code{REGION}) approach that is based on the intuition that similar data objects tend to be allocated in contiguous  regions of the address space and tend to exhibit similar spatial behavior.  We compared the miss rate and bandwidth properties of both the  \code{PC} (256 entries, fully associative) and \code{REGION} (1024 entries, 4KB region size)  predictors. The size of the predictors was selected as the sweet spot in  behavior for each predictor type.  For all applications apart from cactus (a high spatial locality application), \code{REGION}-based prediction tends to overfetch and waste bandwidth as compared to \code{PC}-based prediction, which has 27\% less bandwidth consumption on average across all applications.  For 17 out of 22 applications, \code{REGION}-based prediction shows 17\%  better MPKI on average (max: 49\% for cactus). For 5 applications (apache, art, mcf, lbm, and omnetpp), we find that \code{PC} demonstrates better accuracy when predicting the spatial behavior of cache blocks than \code{REGION} and demonstates a 24\% improvement in MPKI (max: 68\% for omnetpp).
+A critical choice with the history-based prediction is the selection of the predictor index. Two types of predictor indexing were explored:
+\begin{itemize}[noitemsep]
+  \item a program counter based(\code{PC}) approach\cite{chen-hpca-2004} based on the intuition that fields in a data structure are accessed by specific PCs and tend to exhibit similar spatial behavior. The tag includes the PC and the critical word index: $((PC>>3)<<3)+\frac{(addr\%64)}{8}$.
+  \item a \textit{Region}-based (\code{REGION}) approach that is based on the intuition that similar data objects tend to be allocated in contiguous  regions of the address space and tend to exhibit similar spatial behavior. 
+\end{itemize}
+
+The miss rate and bandwidth properties of both the  \code{PC} (256 entries, fully associative) and \code{REGION} (1024 entries, 4KB region size) predictors were compared. The size of the table used in each predictor was selected as the optimal found by empirical analysis for each predictor type.  For all applications apart from cactus (a high spatial locality application), \code{REGION}-based prediction tends to overfetch and waste bandwidth as compared to \code{PC}-based prediction, which has 27\% less bandwidth consumption on average across all applications. For 17 out of 22 applications, \code{REGION}-based prediction shows 17\%  better MPKI on average (max: 49\% for cactus). For 5 applications (apache, art, mcf, lbm, and omnetpp), \code{PC} has better accuracy when predicting the spatial behavior of cache blocks than \code{REGION} and demonstrates a 24\% improvement in MPKI (max: 68\% for omnetpp).
 
 \subsection{Predictor Table}
 
-We studied the organization and size of the pattern table using the \code{REGION} predictor. We evaluated the following parameters a) region size, which directly correlates with the coverage of a fixed-size table, and b) the size of the predictor table, which influences how many unique region patterns can be tracked, and c) the \# of bits required to represent the spatial pattern.
+The organization and size of the pattern table was studied using the \code{REGION} predictor. The following parameters were evaluated :
+\begin{itemize}[noitemsep]
+  \item region size, which directly correlates with the coverage of a fixed-size table
+  \item the size of the predictor table
+  \item the number of bits required to represent the spatial pattern.
+\end{itemize}
 
-Large region sizes effectively reduce the \# of regions in the working set and require a smaller predictor table. However, a larger region is likely to have more blocks that exhibit varied spatial behavior and may pollute the pattern entry.  We find that going from 1KB (4096 entries) to 4KB (1024 entries) regions, the 4KB region granularity decreased miss rate by 0.3\% and increased bandwidth by 0.4\% even though both tables provide the same working set coverage (4MB).  Fixing the region size at 4KB, we studied the benefits of an unbounded table.  Compared to a 1024 entry table (\code{FINITE} in Figure~\ref{fig:Predictor_All_Apps}), the unbounded table increases miss rate by 1\% and decreases bandwidth by 0.3\% . A 1024 entry predictor table (4KB region granularity per-entry) suffices for most applications. Organizing the 1024 entries as a 128-set$\times$8-way table sufficesfor eliminating associativity related conflicts (<0.8\% evictions due to lack of ways).
+Large region sizes effectively reduce the number of regions in the working set and require a smaller predictor table. However, a larger region is likely to have more blocks that exhibit varied spatial behavior and may pollute the pattern entry.  We find that going from 1KB (4096 entries) to 4KB (1024 entries) regions, the 4KB region granularity decreased miss rate by 0.3\% and increased bandwidth by 0.4\% even though both tables provide the same working set coverage (4MB).  Fixing the region size at 4KB, we studied the benefits of an unbounded table.  Compared to a 1024 entry table (\code{FINITE} in Figure~\ref{fig:Predictor_All_Apps}), the unbounded table increases miss rate by 1\% and decreases bandwidth by 0.3\% . A 1024 entry predictor table (4KB region granularity per-entry) suffices for most applications. Organizing the 1024 entries as a 128-set$\times$8-way table sufficesfor eliminating associativity related conflicts ($<$0.8\% evictions due to lack of ways).
 
 Focusing on the number of bits required to represent the pattern table, we evaluated the use of 4-bit saturation counters (instead of 1-bit bitmaps). The saturation counters seek to avoid pattern pollution when blocks with varied spatial behavior reside in the same region. Interestingly, we find that it is more beneficial to use 1-bit bitmaps for the majority of the applications (12 out of 22); the hysteresis introduced by the counters increases training period.  
 
@@ -157,6 +181,27 @@ A widely-used approach to training the predictor is to harvest the word usage in
 % optimisation for bandwidth as our fall back was to predict a full cache line
 % which would have not have a first order impact on miss rate.
 
+\begin{figure}[h]
+  \centering
+    \subfloat[Misses Per Kilo Instructions]{
+      \includegraphics[width=\textwidth]{files/Plots/08-Predictor-MPKI.pdf}
+    }
+    
+    \subfloat[Bandwidth]{
+      \includegraphics[width=\textwidth]{files/Plots/08-Predictor-BW.pdf}
+    }
+    \caption[Predictor Performance]{ The charts above show the performance of the different types of \AC\ predictors in terms of misses per kilo instructions and miss bandwidth for a 64K L1 equivalent scaled to the performance of a fixed granularity conventional cache. \\ \\
+      \code{FINITE}: \code{REGION} predictor (1024 entry table and 4K region size). \\
+      \code{INFINITE}: Unbounded predictor table (\code{REGION} predictor). \\ 
+      \code{FINITE+FT}: \code{FINITE} with hints for prediction on compulsory misses (first touches). \\
+      \code{INF+FT}: \code{INFINITE} with hints for prediction on compulsory misses (first touches). \\
+      \code{HISTORY}: Uses spatial pattern hints collected at eviction from a prior run. 
+    }
+    \label{fig:Predictor_All_Apps}
+\end{figure}
+
+\clearpage
+
 \subsection{Predictor Summary}
 \begin{itemize}
   \item For the majority of the applications (17/22) the address-region predictor with region size 4KB works well. However, five applications (apache, lbm, mcf, art, omnetpp) show better performance with PC-based indexing. For best efficiency, the predictor should adapt indexing to each application. 
@@ -165,10 +210,31 @@ A widely-used approach to training the predictor is to harvest the word usage in
   \item The 1024-entry (4K region size) predictor table imposes $\simeq$0.12\% energy overhead on the overall cache hierarchy energy since it is referenced only on misses.
 \end{itemize}
 
-
 \section{\AC\ Adaptivity}
 \label{sec:adaptivity}
 
+We demonstrate that \AC{} can adapt better than a conventional cache to the variations in spatial locality.
 
+\subsection{Tuning RMAX for High Spatial Locality} 
+
+A challenge often faced by conventional caches is the desire to widen the cache block (to achieve spatial prefetching) without wasting space and bandwidth in low spatial locality applications. We study 3 specific applications: milc and tradesoap have good spatial locality and soplex has poor spatial locality. With a conventional 1M cache, when we widen the block size from 64 to 128 bytes, milc and tradesoap experience a 37\% and 39\% reduction in miss rate. However, soplex's miss rate increases by 2$\times$ and bandwidth by 3.1$\times$.
+
+With \AC\, we do not have to make this uneasy choice as it permits \AB{}s with granularity 1---RMAX words (RMAX: maximum block size). When we increase RMAX from 64 bytes to 128 bytes, miss rate reduces by 37\% for milc and 24\% for tradesoap, while simultaneously lowering bandwidth by 7\%. Unlike the conventional cache, \AC\ is able to adapt to poor spatial locality: soplex experiences only a 2\% increase in bandwidth and 40\% increase in miss rate.
+
+\begin{figure}[!ht]
+  \centering
+  \vspace{10pt}
+  \includegraphics[width=0.7\textwidth]{files/Plots/08-Bar-Fixed-RMAX.pdf}
+  \label{fig:rmax}
+  \caption{Effect of increase in block size from 64 to 128 bytes in a 1 MB cache}
+ 
+\end{figure}
+
+\subsection{Predicting Strided Accesses} 
+Many applications (e.g.,firefox and canneal) exhibit strided access patterns, which touch a few words in a block before accessing another block. Strided accesses patterns introduce intra-block holes (untouched words). For instance, canneal accesses $\simeq$10K distinct fixed granularity cache blocks  with a specific access pattern, \textbf{[{-}{-}x{-}{-}x{-}{-}]} (\textbf{x} indicates $i^{th}$ word has been touched). 
+
+\input{files/Tables/predictor-policy}
+
+Any predictor that uses the access pattern history has two choices when an access misses on word 3 or 6 a) A miss oriented policy (Policy-Miss) may refill the entire range of words 3--6 and eliminate the secondary miss but bring in untouched words 4--5, increasing bandwidth, and b) a bandwidth focused choice (Policy- BW) that refills only the requested word but will incur more misses. Table~\ref{table:predictor_policy} compares the two contrasting policies for \AC{} (relative to a Fixed granularity baseline cache). Policy-BW saves 9\% bandwidth compared to Policy-Miss but suffer 25-30\% higher miss rate.
 
 \input{files/Tables/Abs_Eval_Oracle}
