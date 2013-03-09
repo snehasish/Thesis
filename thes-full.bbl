@@ -1,5 +1,9 @@
 \begin{thebibliography}{10}
 
+\bibitem{exascale}
+The opportunities and challenges of exascale computing.
+\newblock Technical report, {US} Department of Energy, 2010.
+
 \bibitem{AlameldeenPHD}
 A.~R. Alameldeen.
 \newblock {\em Using Compression to Improve Chip Multiprocessor Performance}.
