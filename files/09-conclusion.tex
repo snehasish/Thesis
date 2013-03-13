@@ -9,5 +9,25 @@
 \chapter{Conclusion}
 \label{chap:conclusions}
 
-\section{Summary}
+In this chapter the primary findings are summarized and describe future work motivated by these findings. 
+
+\section{Conclusions}
+
+This dissertation presents a novel architecture for an adaptive granularity cache memory system, the \AC{}. The \AC\ adapts to the requirements of the application to cache variable sized \AB{}s. This is achived by eliminating the tag array and storing tags and variable granularity data within the same SRAM data array. The \AC\ keeps out the unused words, thus increasing caching efficiency. Experimental evaluations show a reduced miss rate, improvement in performance and reduced consumption in energy. 
+
+Compared to a fixed granularity cache, improves cache utilization to 90\% - 99\% for most applications, saves miss rate by up to 73\% at the L1 level and up to 88\% at the LLC level, and reduces miss bandwidth by up to 84\% at the L1 and 92\% at the LLC. Correspondingly reduces on-chip memory hierarchy energy by as much as 36\% and improves performance by as much as 50\%.
+
+We conclude that the \AC\ is a plausible design which can be implemented with considerations discussed in \S~\ref{sec:hardware_complexity}. We believe the \AC\ is a promising step towards more flexible hardware to suit the ever changing needs of software and becomes more important with added significance of energy efficient hardware.
+
 \section{Future Work}
+The possible avenues of exploration based on the current \AC\ infrastructure are described as follows.
+
+\subsection{Adaptive Granularity Cache Coherence}
+The next logical step would be to explore cache coherence. The \AC\ simulation infrastructure is built on the GEMS-Ruby framework which has been built from the ground up to design and simulate cache coherence protocols, the 
+
+\subsection{Online prediction}
+\paragraph{Compulsory Misses}
+\paragraph{Error Detection and recovery}
+\subsection{Replacement Policies}
+\subsection{Cache Compression}
+\section{Final Thoughts}
