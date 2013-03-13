@@ -71,6 +71,13 @@ Czarek Dubnicki and Thomas~J. LeBlanc.
   Computer architecture}, ISCA '92, pages 170--180, New York, NY, USA, 1992.
   ACM.
 
+\bibitem{Gonzalez:1995:DCM:224538.224622}
+Antonio Gonz\'{a}lez, Carlos Aliagas, and Mateo Valero.
+\newblock A data cache with multiple caching strategies tuned to different
+  types of locality.
+\newblock In {\em Proceedings of the 9th international conference on
+  Supercomputing}, ICS '95, pages 338--347, New York, NY, USA, 1995. ACM.
+
 \bibitem{Hallnor_Reinhardt_2000}
 Erik~G. Hallnor and Steven~K. Reinhardt.
 \newblock A fully associative software-managed cache design.
@@ -91,6 +98,11 @@ Norman~P. Jouppi.
 \newblock In {\em Proceedings of the 17th annual international symposium on
   Computer Architecture}, ISCA '90, pages 364--373, New York, NY, USA, 1990.
   ACM.
+
+\bibitem{power7}
+R.~Kalla, B.~Sinharoy, W.J. Starke, and M.~Floyd.
+\newblock Power7: Ibm's next-generation server processor.
+\newblock {\em Micro, IEEE}, 30(2):7--15, March-April.
 
 \bibitem{Kedzierski-ipdps-2010}
 K.~Kedzierski, M.~Moreto, F.J. Cazorla, and M.~Valero.

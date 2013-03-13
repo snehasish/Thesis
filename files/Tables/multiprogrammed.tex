@@ -1,0 +1,22 @@
+\begin{table}[!h]
+  \vspace{10pt}
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|} 
+      \hline
+      & Miss  & Miss  & Miss  & Miss & BW \\
+      \hline
+      Mix & T1 & T2 & T3 & T4 & (All)\\
+      \hline
+      jbb$\times$2, tpc-c$\times$2 & 12.38\% & 12.38\% & 22.29\% &22.37\% & 39.07\% \\
+      \hline
+      firefox$\times$2, x264$\times$2 & 3.82\% & 3.61\% & --2.44\% & 0.43\% & 15.71\%\\
+      \hline
+      cactus, fluid., omnet., sopl. & 1.01\% & 1.86\% & 22.38\% & 0.59\% & 18.62\% \\
+      \hline
+      canneal, astar, ferret, milc & 4.85\% & 2.75\% & 19.39\% & --4.07\% & 17.77\%\\
+      \hline
+  \end{tabular}
+  \caption[Multiprogrammed workloads on \AC{}]{\textbf{Multiprogrammed Workloads on 1M Shared \AC{}}: Percentage reduction in miss rate and bandwidth. \\ \\  
+  --: indicates Miss or BW higher than Fixed. T1---T4, threads in the mix; in the order of applications in the mix. Baseline: Fixed granularity 1M conventional cache.}
+  \label{table:multiprogrammed} 
+\end{table}

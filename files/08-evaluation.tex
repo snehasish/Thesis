@@ -127,8 +127,9 @@ An alternative strategy to accommodate \AC{}'s overheads is to add an extra pipe
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=\textwidth]{files/Figures/Placeholder_Chart_Wide.pdf}
-  \caption{Placeholder for extra pipeline stage performance plot -- all apps}
+  \vspace{10pt}
+  \includegraphics[width=\textwidth]{files/Plots/08-ExtraStage.pdf}
+  \caption[Extra Cache Pipeline Stage Performance]{Percentage reduction in cycle time for all applications with with addition of an extra cache pipeline stage to accomodate for the \AC\ lookup overhead. positive bars indicate better performance. Negative bars indicate degradation in performance.}
   \label{fig:extra_cache_pipeline_stage}
 \end{figure}
 
@@ -137,8 +138,8 @@ The L2's higher cache capacity makes it less susceptible to pollution and provid
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=\textwidth]{files/Figures/Placeholder_Chart_Wide.pdf}
-  \caption{Placeholder for off chip energy plot -- all apps}
+  \includegraphics[width=\textwidth]{files/Plots/08-Oracle-OffChip-Energy.pdf}
+  \caption[Off-Chip Energy Reduction]{Off chip energy reduction for all applications. Higher bars indicate greater savings in energy.}
   \label{fig:offchip_energy}
 \end{figure}
 
@@ -156,7 +157,7 @@ A critical choice with the history-based prediction is the selection of the pred
   \item a \textit{Region}-based (\code{REGION}) approach that is based on the intuition that similar data objects tend to be allocated in contiguous  regions of the address space and tend to exhibit similar spatial behavior. 
 \end{itemize}
 
-The miss rate and bandwidth properties of both the  \code{PC} (256 entries, fully associative) and \code{REGION} (1024 entries, 4KB region size) predictors were compared. The size of the table used in each predictor was selected as the optimal found by empirical analysis for each predictor type.  For all applications apart from cactus (a high spatial locality application), \code{REGION}-based prediction tends to overfetch and waste bandwidth as compared to \code{PC}-based prediction, which has 27\% less bandwidth consumption on average across all applications. For 17 out of 22 applications, \code{REGION}-based prediction shows 17\%  better MPKI on average (max: 49\% for cactus). For 5 applications (apache, art, mcf, lbm, and omnetpp), \code{PC} has better accuracy when predicting the spatial behavior of cache blocks than \code{REGION} and demonstrates a 24\% improvement in MPKI (max: 68\% for omnetpp).
+The miss rate and bandwidth properties of both the \code{PC} (256 entries, fully associative) and \code{REGION} (1024 entries, 4KB region size) predictors were compared. The size of the table used in each predictor was selected as the optimal found by empirical analysis for each predictor type.  For all applications apart from cactus (a high spatial locality application), \code{REGION}-based prediction tends to overfetch and waste bandwidth as compared to \code{PC}-based prediction, which has 27\% less bandwidth consumption on average across all applications. For 17 out of 22 applications, \code{REGION}-based prediction shows 17\%  better MPKI on average (max: 49\% for cactus). For 5 applications (apache, art, mcf, lbm, and omnetpp), \code{PC} has better accuracy when predicting the spatial behavior of cache blocks than \code{REGION} and demonstrates a 24\% improvement in MPKI (max: 68\% for omnetpp).
 
 \subsection{Predictor Table}
 
@@ -167,19 +168,7 @@ The organization and size of the pattern table was studied using the \code{REGIO
   \item the number of bits required to represent the spatial pattern.
 \end{itemize}
 
-Large region sizes effectively reduce the number of regions in the working set and require a smaller predictor table. However, a larger region is likely to have more blocks that exhibit varied spatial behavior and may pollute the pattern entry.  We find that going from 1KB (4096 entries) to 4KB (1024 entries) regions, the 4KB region granularity decreased miss rate by 0.3\% and increased bandwidth by 0.4\% even though both tables provide the same working set coverage (4MB).  Fixing the region size at 4KB, we studied the benefits of an unbounded table.  Compared to a 1024 entry table (\code{FINITE} in Figure~\ref{fig:Predictor_All_Apps}), the unbounded table increases miss rate by 1\% and decreases bandwidth by 0.3\% . A 1024 entry predictor table (4KB region granularity per-entry) suffices for most applications. Organizing the 1024 entries as a 128-set$\times$8-way table sufficesfor eliminating associativity related conflicts ($<$0.8\% evictions due to lack of ways).
-
-Focusing on the number of bits required to represent the pattern table, we evaluated the use of 4-bit saturation counters (instead of 1-bit bitmaps). The saturation counters seek to avoid pattern pollution when blocks with varied spatial behavior reside in the same region. Interestingly, we find that it is more beneficial to use 1-bit bitmaps for the majority of the applications (12 out of 22); the hysteresis introduced by the counters increases training period.  
-
-To summarize, we find that a \code{REGION} predictor with region size 4KB and 1024 entries can predict the spatial pattern in a majority of the applications. CACTI indicates that the predictor table can be indexed in 0.025ns and requires 2.3pJ per miss indexing.
-
-\subsection{Spatial Pattern Training} 
-
-A widely-used approach to training the predictor is to harvest the word usage information on an eviction. Unfortunately, evictions may not be frequent, which means the predictor's training period tends to be long, during which the cache performs less efficiently and/or that the application's phase has changed in the meantime. Particularly at the time of first touch (compulsory miss to a location), we need to infer the global spatial access patterns. We compare the finite region predictor (\code{FINITE} in Figure~\ref{fig:Predictor_All_Apps}) that only predicts using eviction history, against a \code{FINITE+FT}: this adds the optimization of inferring the default pattern (in this paper, from a prior run) when there is no predictor information. \code{FINITE+FT} demonstrates an avg. 1\% (max: 6\% for jbb) reduction in miss rate compared to \code{FINITE} and comes within 16\% the miss rate of \code{HISTORY}. In terms of bandwidth \code{FINITE+FT} can save 8\% of the bandwidth (up to 32\% for lbm) compared to \code{FINITE}. The percentage of first-touch accesses is shown in Table~\ref{table:Abs_Eval_Oracle}.  
-
-% Maybe we should point out that the first touch is a more important
-% optimisation for bandwidth as our fall back was to predict a full cache line
-% which would have not have a first order impact on miss rate.
+Large region sizes effectively reduce the number of regions in the working set and require a smaller predictor table. However, a larger region is likely to have more blocks that exhibit varied spatial behavior and may pollute the pattern entry.  Increasing the region size from 1KB (4096 entries) to 4KB (1024 entries), the 4KB region granularity decreased miss rate by 0.3\% and increased bandwidth by 0.4\% even though both tables provide the same working set coverage (4MB).  Fixing the region size at 4KB, the benefits of an unbounded table were studied.  Compared to a 1024 entry table (\code{FINITE} in Figure~\ref{fig:Predictor_All_Apps}), the unbounded table increases miss rate by 1\% and decreases bandwidth by 0.3\% . A 1024 entry predictor table (4KB region granularity per-entry) suffices for most applications. Organizing the 1024 entries as a 128-set$\times$8-way table suffices to eliminate associativity related conflicts ($<$0.8\% evictions due to lack of ways).
 
 \begin{figure}[h]
   \centering
@@ -202,10 +191,21 @@ A widely-used approach to training the predictor is to harvest the word usage in
 
 \clearpage
 
+Focusing on the number of bits required to represent the pattern table, the use of 4-bit saturation counters (instead of 1-bit bitmaps) was evaluated. The saturation counters seek to avoid pattern pollution when blocks with varied spatial behavior reside in the same region. Interestingly, it was found that it is more beneficial to use 1-bit bitmaps for the majority of the applications (12 out of 22) as the hysteresis introduced by the counters increases training period.  
+
+To summarize, it was found that a \code{REGION} predictor with region size 4KB and 1024 entries can predict the spatial pattern in a majority of the applications. CACTI indicates that the predictor table can be indexed in 0.025ns and requires 2.3pJ per miss indexing.
+
+\subsection{Spatial Pattern Training} 
+
+A widely-used approach to training the predictor is to harvest the word usage information on an eviction. Unfortunately, evictions may not be frequent, which means the predictor's training period tends to be long, during which the cache performs less efficiently and/or that the application's phase has changed in the meantime. Particularly at the time of first touch (compulsory miss to a location), a global spatial access pattern is required due to lack of a specific pattern. The finite region predictor (\code{FINITE} in Figure~\ref{fig:Predictor_All_Apps}) that only predicts using eviction history is compared against a \code{FINITE+FT}: this adds the optimization of inferring the default pattern (from a prior run) when there is no predictor information. \code{FINITE+FT} demonstrates an avg. 1\% (max: 6\% for jbb) reduction in miss rate compared to \code{FINITE} and comes within 16\% the miss rate of \code{HISTORY}. In terms of bandwidth \code{FINITE+FT} can save 8\% of the bandwidth (up to 32\% for lbm) compared to \code{FINITE}. The percentage of first-touch accesses is shown in Table~\ref{table:Abs_Eval_Oracle}.  
+
+
+
+
 \subsection{Predictor Summary}
 \begin{itemize}
   \item For the majority of the applications (17/22) the address-region predictor with region size 4KB works well. However, five applications (apache, lbm, mcf, art, omnetpp) show better performance with PC-based indexing. For best efficiency, the predictor should adapt indexing to each application. 
-  \item Updating the predictor only on evictions leads to long training periods, which causes loss in caching efficiency. We need to develop mechanisms to infer the default pattern based on global behavior demonstrated by resident cache lines.
+  \item Updating the predictor only on evictions leads to long training periods, which causes loss in caching efficiency. Mechanisms to infer the default pattern based on global behavior demonstrated by resident cache lines need to be developed to solve this problem.
   \item The online predictor reduces MPKI by 7\% and bandwidth by 26\% on average relative to the conventional approach. However, it still has a 14\% higher MPKI and 38\% higher bandwidth relative to the \code{HISTORY}-based predictor, indicating room for improvement in prediction. 
   \item The 1024-entry (4K region size) predictor table imposes $\simeq$0.12\% energy overhead on the overall cache hierarchy energy since it is referenced only on misses.
 \end{itemize}
@@ -213,28 +213,81 @@ A widely-used approach to training the predictor is to harvest the word usage in
 \section{\AC\ Adaptivity}
 \label{sec:adaptivity}
 
-We demonstrate that \AC{} can adapt better than a conventional cache to the variations in spatial locality.
+The \AC{} can adapt better than a conventional cache to the variations in spatial locality.
 
 \subsection{Tuning RMAX for High Spatial Locality} 
 
-A challenge often faced by conventional caches is the desire to widen the cache block (to achieve spatial prefetching) without wasting space and bandwidth in low spatial locality applications. We study 3 specific applications: milc and tradesoap have good spatial locality and soplex has poor spatial locality. With a conventional 1M cache, when we widen the block size from 64 to 128 bytes, milc and tradesoap experience a 37\% and 39\% reduction in miss rate. However, soplex's miss rate increases by 2$\times$ and bandwidth by 3.1$\times$.
+A challenge often faced by conventional caches is the desire to widen the cache block (to achieve spatial prefetching) without wasting space and bandwidth in low spatial locality applications. 3 specific applications are studied: milc and tradesoap have good spatial locality while soplex has poor spatial locality. With a conventional 1M cache, when the block size is widened from 64 to 128 bytes, milc and tradesoap experience a 37\% and 39\% reduction in miss rate. However, soplex's miss rate increases by 2$\times$ and bandwidth by 3.1$\times$.
 
-With \AC\, we do not have to make this uneasy choice as it permits \AB{}s with granularity 1---RMAX words (RMAX: maximum block size). When we increase RMAX from 64 bytes to 128 bytes, miss rate reduces by 37\% for milc and 24\% for tradesoap, while simultaneously lowering bandwidth by 7\%. Unlike the conventional cache, \AC\ is able to adapt to poor spatial locality: soplex experiences only a 2\% increase in bandwidth and 40\% increase in miss rate.
+The \AC{} can support \AB{}s with granularity 1---RMAX words (RMAX: maximum block size). When we increase RMAX from 64 bytes to 128 bytes, miss rate reduces by 37\% for milc and 24\% for tradesoap, while simultaneously lowering bandwidth by 7\%. Unlike the conventional cache, the \AC\ is able to adapt to poor spatial locality: soplex experiences only a 2\% increase in bandwidth and 40\% increase in miss rate.
 
 \begin{figure}[!ht]
   \centering
   \vspace{10pt}
   \includegraphics[width=0.7\textwidth]{files/Plots/08-Bar-Fixed-RMAX.pdf}
   \label{fig:rmax}
-  \caption{Effect of increase in block size from 64 to 128 bytes in a 1 MB cache}
+  \caption[\AC\ Adaptivity]{Effect of increase in block size from 64 to 128 bytes in a 1 MB cache}
  
 \end{figure}
 
 \subsection{Predicting Strided Accesses} 
+
 Many applications (e.g.,firefox and canneal) exhibit strided access patterns, which touch a few words in a block before accessing another block. Strided accesses patterns introduce intra-block holes (untouched words). For instance, canneal accesses $\simeq$10K distinct fixed granularity cache blocks  with a specific access pattern, \textbf{[{-}{-}x{-}{-}x{-}{-}]} (\textbf{x} indicates $i^{th}$ word has been touched). 
 
 \input{files/Tables/predictor-policy}
 
 Any predictor that uses the access pattern history has two choices when an access misses on word 3 or 6 a) A miss oriented policy (Policy-Miss) may refill the entire range of words 3--6 and eliminate the secondary miss but bring in untouched words 4--5, increasing bandwidth, and b) a bandwidth focused choice (Policy- BW) that refills only the requested word but will incur more misses. Table~\ref{table:predictor_policy} compares the two contrasting policies for \AC{} (relative to a Fixed granularity baseline cache). Policy-BW saves 9\% bandwidth compared to Policy-Miss but suffer 25-30\% higher miss rate.
+
+\section{\AC\ vs other approaches}
+\label{sec:otherapproaches}
+
+The \AC\ is compared against four approaches:
+
+\begin{itemize}
+  \item \textbf{Fixed-2x}: The baseline is a fixed granularity cache 2$\times$ the capacity of the other designs (64B block).
+  \item \textbf{Sector}: The conventional sector cache design (as in IBM Power7~\cite{power7}): 64B block and a small sector size (16 bytes or 2 words).  This design targets optimal bandwidth. On any access, the cache fetches only the requisite sector, even though it allocates space for the entire line.
+  \item \textbf{Sector-Pre}: Adds prefetching to \textbf{Sector}. This optimized design prefetches multiple sectors based on a spatial granularity predictor to improve the miss rate~\cite{kumar-isca-1998, pujara-hpca-2006}.
+  \item \textbf{Multi\$}: Combines features from line distillation~\cite{Qureshi:2007:LDIS} and spatial-temporal    caches~\cite{Gonzalez:1995:DCM:224538.224622}. It is an aggressive design that partitions a cache into two: a line organized cache (LOC) and a word-organized cache (WOC). At insertion time, Multi\$ uses the spatial granularity hints to direct the cache to either refill words (into the WOC) or the entire line. Two design points are investigated: 50\% of the cache as a WOC (Multi\$-50) and 25\% of cache as a WOC (Multi\$-25).
+\end{itemize}
+
+Sector, Sector-Pre, Multi\$, and \AC\ all use the same spatial predictor hints. On a demand miss, they prefetch all the sub-blocks needed together. Prefetching only changes the timing of an access; it does not change the miss bandwidth and cannot remove the misses caused by cache pollution.
+
+\subsection{Energy and Storage}
+The sector approaches impose low hardware complexity and energy penalty. To filter out unused words, the sector granularity has to be close to word granularity; 2 words per sector leads to a storage penalty of $\simeq$64KB for a 1MB cache. In Multi\$, the WOC increases associativity to the number of words/block.  Multi\$-25 partitions a 64K 4-way cache into a 48K 3-way LOC and a 16K 8-way WOC, increasing associativity to 11. For a 1M cache, Multi\$-50 increases associativity to 36.  Compared to Fixed, Multi\$-50 imposes over 3$\times$ increase in lookup latency, 5$\times$ increase in lookup energy, and $\simeq$4$\times$ increase in tag storage. \AC\ provides a more scalable approach to using adaptive cache lines since it varies the storage dedicated to the tags based on the spatial locality in the application.
+
+\begin{figure}[!ht]
+  \subfloat[64K - Low]{
+    \includegraphics[width=0.5\textwidth]{files/Plots/08-Comparison-Scatter-64K-Low.pdf}
+  }
+  \subfloat[64K - Moderate]{
+     \includegraphics[width=0.5\textwidth]{files/Plots/08-Comparison-Scatter-64K-Moderate.pdf}
+  }
+
+  \subfloat[1M - Low]{
+    \includegraphics[width=0.5\textwidth]{files/Plots/08-Comparison-Scatter-1M-Low.pdf}
+  }
+  \subfloat[1M - Moderate]{
+     \includegraphics[width=0.5\textwidth]{files/Plots/08-Comparison-Scatter-1M-Moderate.pdf}
+  }
+  \caption[\AC\ Comparison]{Relative miss rate and bandwidth for different caches. Baseline (1,1) is the Fixed-2$\times$ design. \\
+    Labels: {\bf \large $\bullet$} Fixed-2x, {\large \bf $\circ$}
+    Sector approaches. {\large \bf $\ast$} : Multi\$, $\bigtriangleup$ Amoeba. \\ 
+    (a),(b) 64K cache (c),(d) 1M cache. Note the different Y-axis scale for each group.}
+  \label{fig:scatter_comp}
+\end{figure}
+
+\clearpage
+
+\subsection{Miss Rate and Bandwidth}
+Figure~\ref{fig:scatter_comp} summarizes the comparison for the moderate and low utilization groups of applications. For the high utilization group, all designs other than Sector have comparable miss rates. \AC\ improves miss rate to within 5\%---6\% of the Fixed-2$\times$ for the low group and within 8\%---17\% for the moderate group. Compared to the Fixed-2$\times$, \AC\ also lowers bandwidth by 40\% (64K cache) and 20\% (1M cache). Compared to Sector-Pre (with prefetching), the \AC\ is able to adapt better with flexible granularity and achieves lower miss rate (up to 30\% for a 64K L1 and 35\% for a 1M LLC equivalent). Multi\$'s benefits are proportional to the fraction of the cache organized as a WOC; Multi\$-50 (18-way for 64K L1 and 36-way for 1M LLC) is needed to match the miss rate of \AC{}. Finally, in the moderate group, many applications exhibit strided access. Compared to Multi-\$'s WOC, which fetches individual words, the \AC\ increases bandwidth since it chooses to fetch the contiguous chunk in order to lower miss rate.
+
+\clearpage
+
+\section{Multicore Shared Cache}
+\label{sec:multicore}
+
+A shared \AC\ is evaluated. By dynamically varying the cache block size and keeping out unused words, the \AC\ effectively minimizes the footprint of an application. Minimizing the footprint helps multiple applications effectively share the cache space. Results are presented for experiments using a 1M shared \AC\ in a 4 core system. Table~\ref{table:multiprogrammed} shows the application mixes; application mixes are chosen across all groups. The change in miss rate is tabulated as miss rate per thread and the overall change in bandwidth for \AC\ with respect to a fixed granularity cache running the same mix. Minimizing the overall footprint enables a reduction in the miss rate of each application in the mix. The commercial workloads (SpecJBB and TPC-C) are able to make use of the space available and achieve a significant reduction in miss rate (avg: 18\%). Only two applications suffered a small increase in miss rate (x264 Mix 2: 2\% and ferret Mix 3: 4\%) due to contention. The overall L2 miss bandwidth significantly improves, showing 16\%---39\% reduction across all workload mixes. An \AC\ based shared cache design can effectively enable the shared cache to support more cores and increase overall throughput. The design space exploration of a coherent \AC\ is part of planned future work.
+
+\input{files/Tables/multiprogrammed}
 
 \input{files/Tables/Abs_Eval_Oracle}
