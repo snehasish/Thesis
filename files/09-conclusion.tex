@@ -22,12 +22,15 @@ We conclude that the \AC\ is a plausible design which can be implemented with co
 \section{Future Work}
 The possible avenues of exploration based on the current \AC\ infrastructure are described as follows.
 
-\subsection{Adaptive Granularity Cache Coherence}
-The next logical step would be to explore cache coherence. The \AC\ simulation infrastructure is built on the GEMS-Ruby framework which has been built from the ground up to design and simulate cache coherence protocols, the 
+\paragraph{Adaptive Granularity Cache Coherence}: Prior work which adapt existing schemes such as sector caches~\cite{Rothman_Smith_2000} to support sub-block coherence~\cite{Subblock_Coherence,minerva}, show the viability of extending \AC\ to a full multicore cache coherence protocol. As previously described in \S~\ref{sec:coherence}, the important issues to tackle when building a directory based \AC\ protocol are :
+\begin{itemize}[noitemsep]
+	\item Maintaining precise information in the coherence directory
+	\item Supporting variable granularity read sharing
+	\item Determining the optimal write invalidation granularity
+\end{itemize}
+Based on the enumerated points, exploring the design space for an \AC\ based cache coherence protocol is part of planned future work. 
 
-\subsection{Online prediction}
-\paragraph{Compulsory Misses}
-\paragraph{Error Detection and recovery}
-\subsection{Replacement Policies}
-\subsection{Cache Compression}
-\section{Final Thoughts}
+\paragraph{Replacement Policies}: Investigating more intelligent replacement policies for the \AC\ can also make for interesting future work. Currently the Psuedo-LRU policy described in \S~\ref{sec:replacement_policy} has been adapted for use in the \AC\ and leaves room for improvement. Inspiration can be drawn from the \textit{Generational Replacement Policy} described by Hallnor et al.\cite{Hallnor_Reinhardt_2000} for a customized replacement policy for the \AC{}. Another issue which a replacement policy can address is the fragmentation within a cache set due to frequent changes in granularity required by the application. A replacement policy tailored for the \AC\ should be able to reduce the unneccessary evictions due to fragmentation within a cache set.
+
+\paragraph{Cache Compression}: Cache compression is an area of work which can benefit from the flexibility of the \AC{} whilst storing variable granularity cache blocks. Prior work such as the compressed memory hierachy by Hallnor et al.\cite{Hallnor04acompressed} can be suitably modified to use an \AC\ as the substrate.
+

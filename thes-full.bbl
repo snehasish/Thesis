@@ -1,7 +1,7 @@
 \begin{thebibliography}{10}
 
 \bibitem{exascale}
-The opportunities and challenges of exascale computing.
+{T}he {O}pportunities and {C}hallenges of {E}xascale {C}omputing.
 \newblock Technical report, {US} Department of Energy, 2010.
 
 \bibitem{AlameldeenPHD}
@@ -16,7 +16,7 @@ D.~Albonesi, A.~Kodi, and Stojanovic V.
 
 \bibitem{Bienia:2008:PBS:1454115.1454128}
 Christian Bienia, Sanjeev Kumar, Jaswinder~Pal Singh, and Kai Li.
-\newblock The parsec benchmark suite: characterization and architectural
+\newblock The {PARSEC} benchmark suite: characterization and architectural
   implications.
 \newblock In {\em Proceedings of the 17th international conference on Parallel
   architectures and compilation techniques}, PACT '08, pages 72--81, New York,
@@ -28,7 +28,8 @@ Stephen~M. Blackburn, Robin Garner, Chris Hoffmann, Asjad~M. Khang, Kathryn~S.
   Samuel~Z. Guyer, Martin Hirzel, Antony Hosking, Maria Jump, Han Lee,
   J.~Eliot~B. Moss, Aashish Phansalkar, Darko Stefanovi\'{c}, Thomas VanDrunen,
   Daniel von Dincklage, and Ben Wiedermann.
-\newblock The dacapo benchmarks: java benchmarking development and analysis.
+\newblock The {D}a{C}apo benchmarks: java benchmarking development and
+  analysis.
 \newblock In {\em Proceedings of the 21st annual ACM SIGPLAN conference on
   Object-oriented programming systems, languages, and applications}, OOPSLA
   '06, pages 169--190, New York, NY, USA, 2006. ACM.
@@ -99,9 +100,16 @@ Norman~P. Jouppi.
   Computer Architecture}, ISCA '90, pages 364--373, New York, NY, USA, 1990.
   ACM.
 
+\bibitem{Subblock_Coherence}
+M.~Kadiyala and L.N. Bhuyan.
+\newblock A dynamic cache sub-block design to reduce false sharing.
+\newblock In {\em Computer Design: VLSI in Computers and Processors, 1995. ICCD
+  '95. Proceedings., 1995 IEEE International Conference on}, pages 313--318,
+  Oct.
+
 \bibitem{power7}
 R.~Kalla, B.~Sinharoy, W.J. Starke, and M.~Floyd.
-\newblock Power7: Ibm's next-generation server processor.
+\newblock Power7: {IBM}'s {N}ext-{G}eneration {S}erver {P}rocessor.
 \newblock {\em Micro, IEEE}, 30(2):7--15, March-April.
 
 \bibitem{Kedzierski-ipdps-2010}
@@ -130,21 +138,22 @@ J.~S. Liptay.
 
 \bibitem{Liu:2011:SPD:2048066.2048070}
 Tongping Liu and Emery~D. Berger.
-\newblock Sheriff: precise detection and automatic mitigation of false sharing.
+\newblock {SHERIFF}: precise detection and automatic mitigation of false
+  sharing.
 \newblock In {\em Proceedings of the 2011 ACM international conference on
   Object oriented programming systems languages and applications}, OOPSLA '11,
   pages 3--18, New York, NY, USA, 2011. ACM.
 
 \bibitem{Llanos:2006:TOT:1228268.1228270}
 Diego~R. Llanos.
-\newblock Tpcc-uva: an open-source tpc-c implementation for global performance
-  measurement of computer systems.
+\newblock {TPCC}-{UV}a: an open-source {TPC-C} implementation for global
+  performance measurement of computer systems.
 \newblock {\em SIGMOD Rec.}, 35(4):6--15, December 2006.
 
 \bibitem{Loh:2012:SVL:2311639.2311823}
 Gabriel Loh and Mark~D. Hill.
-\newblock Supporting very large dram caches with compound-access scheduling and
-  missmap.
+\newblock Supporting {V}ery {L}arge {DRAM} {C}aches with {C}ompound-{A}ccess
+  {S}cheduling and {M}iss{M}ap.
 \newblock {\em IEEE Micro}, 32(3):70--78, May 2012.
 
 \bibitem{Luk:2005:PBC:1065010.1065034}
@@ -159,8 +168,8 @@ Chi-Keung Luk, Robert Cohn, Robert Muth, Harish Patil, Artur Klauser, Geoff
 \bibitem{Martin:2005:MGE:1105734.1105747}
 Milo M.~K. Martin, Daniel~J. Sorin, Bradford~M. Beckmann, Michael~R. Marty, Min
   Xu, Alaa~R. Alameldeen, Kevin~E. Moore, Mark~D. Hill, and David~A. Wood.
-\newblock Multifacet's general execution-driven multiprocessor simulator (gems)
-  toolset.
+\newblock Multifacet's general execution-driven multiprocessor simulator
+  ({GEMS}) toolset.
 \newblock {\em SIGARCH Comput. Archit. News}, 33(4):92--99, November 2005.
 
 \bibitem{manual:OpenSparcT1}
@@ -169,15 +178,16 @@ Sun Microsystems.
 
 \bibitem{Muralimanohar:2007:ONO:1331699.1331704}
 Naveen Muralimanohar, Rajeev Balasubramonian, and Norm Jouppi.
-\newblock Optimizing nuca organizations and wiring alternatives for large
-  caches with cacti 6.0.
+\newblock Optimizing {NUCA} {O}rganizations and {W}iring {A}lternatives for
+  {L}arge {C}aches with {CACTI} 6.0.
 \newblock In {\em Proceedings of the 40th Annual IEEE/ACM International
   Symposium on Microarchitecture}, MICRO 40, pages 3--14, Washington, DC, USA,
   2007. IEEE Computer Society.
 
 \bibitem{patent:DataCacheWayPrediction}
 Ajit~Karthik Mylavarapu.
-\newblock Patent 20100049912 : Data cache way prediction, February 2010.
+\newblock Patent 20100049912 : {D}ata {C}ache {W}ay {P}rediction, February
+  2010.
 
 \bibitem{pujara-hpca-2006}
 P.~Pujara and A.~Aggarwal.
@@ -205,6 +215,12 @@ Moinuddin~K. Qureshi, M.~Aater Suleman, and Yale~N. Patt.
 J~.B. Rothman and A.J. Smith.
 \newblock {\em Sector cache design and performance}, page 124–133.
 \newblock IEEE Comput. Soc, 2000.
+
+\bibitem{minerva}
+Jeffrey~B. Rothman and Alan~Jay Smith.
+\newblock Minerva: An adaptive subblock coherence protocol for improved smp
+  performance.
+\newblock In {\em ISHPC'02}, pages 64--77, 2002.
 
 \bibitem{Seznec-decoupled-sector-cache-isca}
 A.~Seznec.
