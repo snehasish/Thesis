@@ -18,10 +18,10 @@
 
 \prefacesection{Abstract}
 
-Memory in modern computing systems are hierarchial in
+Memory in modern computing systems are hierarchical in
 nature. Maintaining a memory hierarchy enables the system to service
 frequently requested data from a small low latency store located close
-to the processor. The design paradigms of the memory hierachy have
+to the processor. The design paradigms of the memory hierarchy have
 been mostly unchanged since their inception in the late
 1960's. However in the meantime there have been significant changes in
 the tasks computers perform and the way they are programmed. Modern
@@ -29,7 +29,7 @@ computing systems perform more data centric tasks and are programmed
 in higher level languages which introduce many layers of abstraction
 between the programmer and the system. \\ 
 
-Waste in the memory hierarchy refers to the under utilised space in
+Waste in the memory hierarchy refers to the under utilized space in
 the memory system and consequently wasted energy and time. The data
 access patterns of modern workloads are increasingly less uniform
 which makes it hard to design a memory hierarchy with rigid design
@@ -43,10 +43,10 @@ dynamically adapt to the requirements of the application. We propose a
 design that can support a variable number of cache blocks, each of a
 different granularity. It employs a novel organization that completely
 eliminates the tag array, treating the storage array as uniform and
-morphable between tags and data.  This enables the cache to harvest
+morph-able between tags and data.  This enables the cache to harvest
 space from unused words in blocks for additional tag storage, thereby
 supporting a variable number of tags (and correspondingly, blocks).
-The design adjusts individual cache line granularities according to
+The design adjusts individual cache line granularity according to
 the spatial locality in the application.  It adapts to the appropriate
 granularity both for different data objects in an application as well
 as for different phases of access to the same data. \\
