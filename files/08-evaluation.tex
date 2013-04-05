@@ -110,7 +110,7 @@ Note that applications like eclipse and omnetpp hold only 3---5 blocks per set o
     \subfloat[Performance Improvement]{
       \includegraphics[width=\textwidth]{files/Plots/08-Oracle_Perf.pdf}
     }
-    \caption{ The above charts (a) show the percentage reduction in energy and (b) the percentage reduction in cycle time for an \AC\ compared to a fixed granularity conventional cache with 64K L1 and 1M LLC. Higher bars indicate better performance. Y-axis terminated to illustrate bars clearly.}
+    \caption[Overall performance and energy]{The above charts (a) show the percentage reduction in energy and (b) the percentage reduction in cycle time for an \AC\ compared to a fixed granularity conventional cache with 64K L1 and 1M LLC. Higher bars indicate better performance. Y-axis terminated to illustrate bars clearly.}
     \label{plot:multi_sys_perf_energy}
 \end{figure}
 
@@ -216,7 +216,8 @@ A widely-used approach to training the predictor is to harvest the word usage in
 The \AC{} can adapt better than a conventional cache to the variations in spatial locality.
 
 \subsection{Tuning RMAX for High Spatial Locality} 
-
+\label{sec:tuning_rmax_for_high_spatial_locality
+}
 A challenge often faced by conventional caches is the desire to widen the cache block (to achieve spatial prefetching) without wasting space and bandwidth in low spatial locality applications. 3 specific applications are studied: milc and tradesoap have good spatial locality while soplex has poor spatial locality. With a conventional 1M cache, when the block size is widened from 64 to 128 bytes, milc and tradesoap experience a 37\% and 39\% reduction in miss rate. However, soplex's miss rate increases by 2$\times$ and bandwidth by 3.1$\times$.
 
 The \AC{} can support \AB{}s with granularity 1---RMAX words (RMAX: maximum block size). When we increase RMAX from 64 bytes to 128 bytes, miss rate reduces by 37\% for milc and 24\% for tradesoap, while simultaneously lowering bandwidth by 7\%. Unlike the conventional cache, the \AC\ is able to adapt to poor spatial locality: soplex experiences only a 2\% increase in bandwidth and 40\% increase in miss rate.

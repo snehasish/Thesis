@@ -13,24 +13,18 @@ In this chapter the primary findings are summarized and describe future work mot
 
 \section{Conclusions}
 
-This dissertation presents a novel architecture for an adaptive granularity cache memory system, the \AC{}. The \AC\ adapts to the requirements of the application to cache variable sized \AB{}s. This is achieved by eliminating the tag array and storing tags and variable granularity data within the same SRAM data array. The \AC\ keeps out the unused words, thus increasing caching efficiency. Experimental evaluations show a reduced miss rate, improvement in performance and reduced consumption in energy. 
+This dissertation presents a novel architecture for an adaptive granularity cache memory system, the \AC{}. The \AC\ adapts to the requirements of the application to cache variable sized \AB{}s. This is achieved by eliminating the tag array and storing tags and variable granularity data within the same SRAM data array. The \AC\ keeps out the unused words, thus increasing caching efficiency. Experimental evaluations show a reduced miss rate, improvement in performance and reduced consumption in overall energy. Significantly reduced energy consumption is observed primarily due to reduced interconnect traffic.
 
-Compared to a fixed granularity cache, improves cache utilization to 90\% - 99\% for most applications, saves miss rate by up to 73\% at the L1 level and up to 88\% at the LLC level, and reduces miss bandwidth by up to 84\% at the L1 and 92\% at the LLC. Correspondingly reduces on-chip memory hierarchy energy by as much as 36\% and improves performance by as much as 50\%.
+Compared to a fixed granularity cache, the \AC\ improves cache utilization to 90\% - 99\% for most applications, saves miss rate by up to 73\% at the L1 level and up to 88\% at the LLC level, and reduces miss bandwidth by up to 84\% at the L1 and 92\% at the LLC. Correspondingly reduces on-chip memory hierarchy energy by as much as 36\% and improves performance by as much as 50\%.
 
-We conclude that the \AC\ is a plausible design which can be implemented with considerations discussed in \S~\ref{sec:hardware_complexity}. We believe the \AC\ is a promising step towards more flexible hardware to suit the ever changing needs of software and becomes more important with added significance of energy efficient hardware.
+We conclude that the \AC\ is a plausible design which can be implemented with considerations discussed in \S~\ref{sec:hardware_complexity}. We believe the \AC\ is a promising step towards more flexible hardware to suit the ever changing needs of software.
 
-\section{Future Work}
+\section{Looking Forward}
 The possible avenues of exploration based on the current \AC\ infrastructure are described as follows.
 
-\paragraph{Adaptive Granularity Cache Coherence}: Prior work which adapt existing schemes such as sector caches~\cite{Rothman_Smith_2000} to support sub-block coherence~\cite{Subblock_Coherence,minerva}, show the viability of extending \AC\ to a full multicore cache coherence protocol. As previously described in \S~\ref{sec:coherence}, the important issues to tackle when building a directory based \AC\ protocol are :
-\begin{itemize}[noitemsep]
-	\item Maintaining precise information in the coherence directory
-	\item Supporting variable granularity read sharing
-	\item Determining the optimal write invalidation granularity
-\end{itemize}
-Based on the enumerated points, exploring the design space for an \AC\ based cache coherence protocol is part of planned future work. 
+\paragraph{Adaptive Granularity Cache Coherence}: Prior work which adapt existing schemes such as sector caches~\cite{Rothman_Smith_2000} to support sub-block coherence~\cite{Subblock_Coherence,minerva}, show the viability of extending \AC\ to a full multicore cache coherence protocol. We propose a multicore cache coherence protocol, named \textit{Protozoa}, based on the \AC{}, in recent work spearheaded by Zhao\cite{protozoa}. 
 
-\paragraph{Replacement Policies}: Investigating more intelligent replacement policies for the \AC\ can also make for interesting future work. Currently the Pseudo-LRU policy described in \S~\ref{sec:replacement_policy} has been adapted for use in the \AC\ and leaves room for improvement. Inspiration can be drawn from the \textit{Generational Replacement Policy} described by Hallnor et al.\cite{Hallnor_Reinhardt_2000} for a customized replacement policy for the \AC{}. Another issue which a replacement policy can address is the fragmentation within a cache set due to frequent changes in granularity required by the application. A replacement policy tailored for the \AC\ should be able to reduce the unnecessary evictions due to fragmentation within a cache set.
+\paragraph{Replacement Policies}: Investigating more intelligent replacement policies for the \AC\ can also make for interesting future work. Currently the Pseudo-LRU policy described in \S~\ref{sec:replacement_policy} has been adapted for use in the \AC\ and leaves room for improvement. Inspiration can be drawn from the \textit{Generational Replacement Policy} described by Hallnor et al.\cite{Hallnor_Reinhardt_2000} for a customized replacement policy for the \AC{}. 
 
 \paragraph{Cache Compression}: Cache compression is an area of work which can benefit from the flexibility of the \AC{} whilst storing variable granularity cache blocks. Prior work such as the compressed memory hierarchy by Hallnor et al.\cite{Hallnor04acompressed} can be suitably modified to use an \AC\ as the substrate.
 

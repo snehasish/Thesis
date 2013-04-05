@@ -241,6 +241,11 @@ R.B. Tremaine, T.B. Smith, M.~Wazlowski, D.~Har, Kwok-Ken Mak, and
 \newblock Pinnacle: Ibm mxt in a memory controller chip.
 \newblock {\em Micro, IEEE}, 21(2):56 --68, mar/apr 2001.
 
+\bibitem{prefetchers}
+S.P. Vander~Wiel and D.J. Lilja.
+\newblock When caches aren't enough: data prefetching techniques.
+\newblock {\em Computer}, 30(7):23--30, 1997.
+
 \bibitem{Veidenbaum:1999:ACL:305138.305188}
 Alexander~V. Veidenbaum, Weiyu Tang, Rajesh Gupta, Alexandru Nicolau, and
   Xiaomei Ji.
@@ -272,5 +277,11 @@ Doe~Hyun Yoon, Min~Kyu Jeong, Michael~B. Sullivan, and Mattan Erez.
 Meng-Bing Yu, Era~K. Nangia, Michael Ni, and Vidya Rajagopalan.
 \newblock Patent 7594079 : Data cache virtual hint way prediction, and
   applications thereof, September 2009.
+
+\bibitem{protozoa}
+Hongzhou Zhao, Arrvindh Shriraman, Snehasish Kumar, and Sandhya Dwarkadas.
+\newblock Protozoa : {A}daptive {G}ranularity {C}ache {C}oherence.
+\newblock In {\em In proceedings of the {I}nternational {S}ymposium of
+  {C}omputer {A}rchitecture}, 2013.
 
 \end{thebibliography}
